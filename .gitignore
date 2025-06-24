@@ -1,2 +1,4 @@
-.godot
-.idea
+.godot/
+.idea/
+**/.idea/
+.idea/
