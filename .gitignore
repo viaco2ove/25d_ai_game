@@ -1,4 +1,6 @@
-.godot/
-.idea/
+**/.godot/
 **/.idea/
 .idea/
+.godot/
+/.idea/
+/.godot/
