@@ -1,0 +1,66 @@
+[gd_scene load_steps=3 format=3 uid="uid://d0pftcier2ckd"]
+
+[ext_resource type="Script" uid="uid://mgmjm2mmjfna" path="res://main_scene.gd" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://canvas_layer.gd" id="1_ig7tw"]
+
+[node name="MainNote" type="Node2D"]
+
+[node name="MainScene" type="CanvasLayer" parent="."]
+script = ExtResource("1_0xm2m")
+
+[node name="Background" type="TextureRect" parent="MainScene"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Content" type="Control" parent="MainScene"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BottomMenu" type="HBoxContainer" parent="MainScene"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -31.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="BookBtn" type="Button" parent="MainScene/BottomMenu"]
+layout_mode = 2
+text = "列表"
+
+[node name="AddBtn" type="Button" parent="MainScene/BottomMenu"]
+layout_mode = 2
+text = "+"
+
+[node name="ChatBtn" type="Button" parent="MainScene/BottomMenu"]
+layout_mode = 2
+text = "聊天"
+
+[node name="UserBtn" type="Button" parent="MainScene/BottomMenu"]
+layout_mode = 2
+text = "用户"
+
+[node name="StoryCreator" type="CanvasLayer" parent="."]
+script = ExtResource("1_ig7tw")
+
+[node name="InputPanel" type="Panel" parent="StoryCreator"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TextEdit" type="TextEdit" parent="StoryCreator/InputPanel"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="DebugBtn" type="Button" parent="StoryCreator/InputPanel"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="MapPreview" type="SubViewport" parent="StoryCreator"]
+
+[node name="Camera3D" type="Camera3D" parent="StoryCreator/MapPreview"]

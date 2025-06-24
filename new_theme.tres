@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://drh1gcllyfff7"]
+
+[sub_resource type="SystemFont" id="SystemFont_j2q5q"]
+
+[resource]
+default_base_scale = 0.71
+default_font = SubResource("SystemFont_j2q5q")
+/colors/red = Color(0.788235, 0, 0, 1)
