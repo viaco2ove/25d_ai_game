@@ -1,6 +1,8 @@
 # MapPreview.gd (附加到MapPreview节点)
 extends SubViewportContainer
 
+@onready var cam: Camera3D = $SubViewport/Camera3D
+
 # 资源缓存
 var _material_cache = {}
 var _current_map: Node3D
@@ -20,6 +22,11 @@ func _ready():
 
 	# 监听尺寸变化
 	resized.connect(_on_resized)
+
+	cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
+	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
+	cam.fov = 65	# 减小视野角度，减少透视畸变
+	cam.current = true
 
 func _on_resized():
 	$SubViewport.size = size
@@ -172,6 +179,18 @@ func _create_environment() -> Environment:
 	var env = Environment.new()
 	env.glow_enabled = true
 	env.glow_intensity = 0.6
+
+	# 新增：环境光遮蔽
+	env.ssao_enabled = true
+	env.ssao_intensity = 0.5
+	env.ssao_radius = 1.0
+
+	# 新增：雾效增强深度感
+	env.fog_enabled = true
+	env.fog_depth_begin = 15
+	env.fog_depth_end = 30
+	env.fog_depth_curve = 0.5
+
 	return env
 
 func _create_terrain() -> Node3D:
@@ -188,5 +207,5 @@ func _create_terrain() -> Node3D:
 	material.roughness = 0.9
 	mesh_instance.material_override = material
 
-	mesh_instance.position = Vector3(0, 0, 0)
+	mesh_instance.position = Vector3(0, -1, 0) # 稍微下沉
 	return mesh_instance
