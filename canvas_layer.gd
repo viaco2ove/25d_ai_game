@@ -7,12 +7,21 @@ extends CanvasLayer
 @onready var hint_label: Label = $InputPanel/HintLabel
 
 var map_preview: SubViewportContainer
+# 新增AI服务引用
+var ai_service: Node
 
 func _ready():
 	# UI初始化
 	debug_btn.pressed.connect(_on_generate_pressed)
 	text_edit.text_changed.connect(_on_text_changed)
 	_setup_ui_layout()
+
+	# 正确初始化AI服务
+	ai_service = preload("res://ai_service_v3.gd").new()
+	add_child(ai_service)  # 添加到场景树中
+
+	# 修改提示文本
+	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）"
 
 	# 移动端适配
 	if OS.has_feature("mobile"):
@@ -30,9 +39,14 @@ func _setup_ui_layout():
 	hint_label.text = "提示：输入包含地形关键词(森林/山脉/河流等)，按回车生成预览"
 
 func _on_generate_pressed():
+	var user_input = text_edit.text
+	# 调用AI服务解析语义
+	var terrain_data = ai_service.analyze_terrain(user_input)
+
 	if map_preview:
 		# 调用MapPreview的生成接口
-		map_preview.generate_map(text_edit.text)
+		# map_preview.generate_map(text_edit.text)
+		map_preview.generate_from_data(terrain_data)
 	else:
 		push_error("MapPreview节点未找到!")
 
