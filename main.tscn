@@ -110,7 +110,8 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="BottomMenu" type="HBoxContainer" parent="MainScene"]
+[node name="BottomMenu" type="MarginContainer" parent="MainScene"]
+custom_minimum_size = Vector2(0, 60)
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
@@ -118,20 +119,33 @@ anchor_bottom = 1.0
 offset_top = -31.0
 grow_horizontal = 2
 grow_vertical = 0
+
+[node name="MenuContainer" type="HBoxContainer" parent="MainScene/BottomMenu"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_lquwl")
 alignment = 1
 
-[node name="BookBtn" type="Button" parent="MainScene/BottomMenu"]
+[node name="BookBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
-text = "列表"
+size_flags_horizontal = 3
+theme = ExtResource("4_lquwl")
+text = "列表📖"
 
-[node name="AddBtn" type="Button" parent="MainScene/BottomMenu"]
+[node name="AddBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
-text = "+"
+size_flags_horizontal = 3
+theme = ExtResource("4_lquwl")
+text = "[ + ]"
 
-[node name="ChatBtn" type="Button" parent="MainScene/BottomMenu"]
+[node name="ChatBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
-text = "聊天"
+size_flags_horizontal = 3
+theme = ExtResource("4_lquwl")
+text = "聊天💬"
 
-[node name="UserBtn" type="Button" parent="MainScene/BottomMenu"]
+[node name="UserBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
-text = "用户"
+size_flags_horizontal = 3
+theme = ExtResource("4_lquwl")
+text = "用户👤"

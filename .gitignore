@@ -1,4 +1,7 @@
 .idea/
 .godot/
 config.cfg
+*.iml
+*.log
+*.tep
 
