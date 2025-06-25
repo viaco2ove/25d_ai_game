@@ -1,9 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://d0pftcier2ckd"]
+[gd_scene load_steps=9 format=3 uid="uid://d0pftcier2ckd"]
 
 [ext_resource type="Script" uid="uid://mgmjm2mmjfna" path="res://main_scene.gd" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://cjhxecs34uwxg" path="res://main.gd" id="1_1bvp3"]
-[ext_resource type="Script" uid="uid://b2igmyojuj8p4" path="res://map_preview.gd" id="1_h2yge"]
+[ext_resource type="Script" uid="uid://b2igmyojuj8p4" path="res://map/map_preview.gd" id="1_h2yge"]
 [ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://canvas_layer.gd" id="1_ig7tw"]
+[ext_resource type="Theme" uid="uid://drh1gcllyfff7" path="res://new_theme.tres" id="4_lquwl"]
+
+[sub_resource type="Animation" id="Animation_272bh"]
+resource_name = "pin"
+loop_mode = 1
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5vw27"]
+_data = {
+&"pin": SubResource("Animation_272bh")
+}
+
+[sub_resource type="GDScript" id="GDScript_lquwl"]
 
 [node name="MainNote" type="Node2D"]
 script = ExtResource("1_1bvp3")
@@ -21,6 +33,14 @@ render_target_update_mode = 4
 
 [node name="StoryCreator" type="CanvasLayer" parent="."]
 script = ExtResource("1_ig7tw")
+
+[node name="ExitDebugBtn" type="Button" parent="StoryCreator"]
+visible = false
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 140.0
+offset_bottom = 60.0
+text = "退出调试"
 
 [node name="InputPanel" type="Panel" parent="StoryCreator"]
 offset_left = 5.0
@@ -52,6 +72,30 @@ text = "调试"
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
+
+[node name="LoadingIndicator" type="Control" parent="StoryCreator"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_lquwl")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="StoryCreator/LoadingIndicator"]
+libraries = {
+&"": SubResource("AnimationLibrary_5vw27")
+}
+script = SubResource("GDScript_lquwl")
+
+[node name="Label" type="Label" parent="StoryCreator/LoadingIndicator"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "加载中..."
 
 [node name="MainScene" type="CanvasLayer" parent="."]
 script = ExtResource("1_0xm2m")
