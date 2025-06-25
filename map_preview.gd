@@ -46,10 +46,13 @@ func generate_map(story_text: String):
 
 func _clear_current_map():
 	for child in $SubViewport.get_children():
+		if child is Camera3D:
+			continue
 		child.queue_free()
 
 func _deferred_generate_map(story_text: String):
 	print("开始生成地图场景")
+	
 	var keywords = _extract_keywords(story_text)
 	var map_node = _create_2_5d_map(keywords)
 
@@ -100,12 +103,12 @@ func _create_2_5d_map(keywords: Array) -> Node3D:
 		map_root.add_child(multi_instance)
 
 	# 4. 设置摄像机
-	var cam = Camera3D.new()
+	#	cam = Camera3D.new()
 	cam.position = Vector3(0, 15, 10)
 	cam.rotation_degrees = Vector3(-60, 0, 0)
 	cam.fov = 75
 	cam.current = true
-	map_root.add_child(cam)
+	#map_root.add_child(cam)
 
 	# 5. 添加方向光
 	var sun = DirectionalLight3D.new()
@@ -202,10 +205,42 @@ func _create_terrain() -> Node3D:
 	var mesh_instance = MeshInstance3D.new()
 	mesh_instance.mesh = plane_mesh
 
-	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.3, 0.6, 0.3)
-	material.roughness = 0.9
-	mesh_instance.material_override = material
+	var material2 = StandardMaterial3D.new()
+	material2.albedo_color = Color(0.3, 0.6, 0.3)
+	material2.roughness = 0.9
+	mesh_instance.material_override = material2
 
 	mesh_instance.position = Vector3(0, -1, 0) # 稍微下沉
 	return mesh_instance
+
+# map_preview.gd 中添加新函数
+func generate_from_data(data: Dictionary):
+	set_render_enabled(true)
+	_clear_current_map()
+	call_deferred("_deferred_generate_from_data", data)
+
+func _deferred_generate_from_data(data: Dictionary):
+	print("开始基于地形数据生成地图")
+
+	var keywords = []
+	if data.has("biome"):
+		keywords.append(data["biome"].to_lower())
+	if data.has("elevation"):
+		keywords.append("山脉")
+	if data.has("water") and data["water"]["coverage"] > 0:
+		keywords.append("河流")
+
+	var map_node = _create_2_5d_map(keywords)
+	map_node.position = Vector3.ZERO
+
+	# 添加世界环境效果
+	var env = WorldEnvironment.new()
+	env.environment = _create_environment()
+	map_node.add_child(env)
+
+	$SubViewport.add_child(map_node)
+	_current_map = map_node
+
+	$SubViewport.size = Vector2(1024, 768)
+	$SubViewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	print("基于AI数据的地图场景生成完成")

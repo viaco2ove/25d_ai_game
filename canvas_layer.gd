@@ -17,11 +17,11 @@ func _ready():
 	_setup_ui_layout()
 
 	# 正确初始化AI服务
-	ai_service = preload("res://ai_service_v3.gd").new()
+	ai_service =load("res://ai_service_v3.gd").new()
 	add_child(ai_service)  # 添加到场景树中
 
 	# 修改提示文本
-	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）"
+	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）关键词(森林/山脉/河流等)"
 
 	# 移动端适配
 	if OS.has_feature("mobile"):
@@ -38,10 +38,10 @@ func _setup_ui_layout():
 	# 设置提示文本
 	hint_label.text = "提示：输入包含地形关键词(森林/山脉/河流等)，按回车生成预览"
 
-func _on_generate_pressed():
+func _on_generate_pressed() -> void:
 	var user_input = text_edit.text
 	# 调用AI服务解析语义
-	var terrain_data = ai_service.analyze_terrain(user_input)
+	var terrain_data =await ai_service.analyze_terrain(user_input)
 
 	if map_preview:
 		# 调用MapPreview的生成接口
