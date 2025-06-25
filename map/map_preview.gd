@@ -66,11 +66,13 @@ func reset_viewport():
 	
 	print("SubViewport子节点数: ", $SubViewport.get_child_count())
 	
+	
 func _clear_gpu_resources():
 	# 释放MultiMesh等显存占用
 	RenderingServer.global_shader_parameter_remove("multimesh_data")
 	RenderingServer.force_draw()  # 强制GPU刷新
-	
+
+	await get_tree().process_frame  # 等待一帧确保回收
 # 根据故事文本生成地图
 func generate_map(story_text: String):
 	set_render_enabled(true)
