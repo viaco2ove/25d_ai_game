@@ -1,0 +1,95 @@
+{
+	"asset_type": {
+		"森林": "森林",
+		"树林": "森林",
+		"丛林": "森林",
+		"魔法森林": "森林",
+		"山脉": "山脉", "山峰": "山脉", "山丘": "山脉",
+		"火山": "山脉", "积雪火山": "山脉",
+		"河流": "河流", "小溪": "河流", "湖泊": "河流", "水域": "河流"
+	},
+  "model_bindings": {
+	"森林": "res://kenney_pirate-kit/Models/OBJ format/grass-patch.obj",
+	"山脉": "res://kenney_pirate-kit/Models/OBJ format/rocks-sand-a.obj",
+	"河流": "res://kenney_nature-kit/Models/OBJ format/ground_pathBend.obj"
+  },
+	"elevation_mapping": {
+		"积雪火山": "森林",
+		"火山": "山脉",
+		"丘陵": "小山",
+		"峡谷": "裂谷"
+	},
+	"water_mapping": {
+		"河流": "河流",
+		"湖泊": "湖泊",
+		"海洋": "海洋"
+	},
+  "material_cache": {
+	"魔法森林": {
+	  "albedo_color": [
+		0.2,
+		0.4,
+		0.1
+	  ],
+	  "roughness": 0.8
+	},
+	"森林": {
+		  "albedo_color": [
+			  0.2,
+			  0.4,
+			  0.1
+		  ],
+		  "roughness": 0.8
+	},  
+	"积雪火山": {
+	  "albedo_color": [
+		0.95,
+		0.95,
+		0.98
+	  ],
+	  "metallic": 0.3,
+	  "roughness": 0.7
+	},
+	"沙漠": {
+	  "albedo_color": [
+		0.8,
+		0.7,
+		0.4
+	  ],
+	  "roughness": 0.9
+	}
+  },
+  "light_settings": {
+	"白天": {
+	  "rotation": [45, 30, 0],
+	  "color": [1.0, 0.9, 0.8],
+	  "energy": 1.5
+	},
+	"黄昏": {
+	  "rotation": [
+		-100,
+		30,
+		0
+	  ],
+	  "color": [
+		1.0,
+		0.7,
+		0.5
+	  ],
+	  "energy": 1.2
+	},
+	"夜晚": {
+	  "rotation": [
+		-150,
+		30,
+		0
+	  ],
+	  "color": [
+		0.5,
+		0.6,
+		1.0
+	  ],
+	  "energy": 0.5
+	}
+  }
+}
