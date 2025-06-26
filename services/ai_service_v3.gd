@@ -26,10 +26,20 @@ func analyze_terrain(prompt: String) -> Dictionary:
 		"elevation": {"type": "地形特征", "intensity": 0.0-1.0},
 		"water": {"type": "水域类型", "coverage": 0.0-1.0},
 		"vegetation": {"density": 0.0-1.0, "color": "HEX颜色"},
+		"position": {
+			"reference_point": "参考点(如:火山/河流)",
+			"distance": 0.0-1.0
+		},
 		"atmosphere": {"light": "白天/夜晚/黄昏", "weather": "晴朗/雾/雨"}
+		"settlements": {"type": "村庄/城堡", "density": 0.0-1.0}
 	}
+	// 位置转换规则：
+	"远处" -> distance=0.8, 
+	"山下" -> distance=0.2,
+	"附近" -> distance=0.3
 	"""
-
+# 量词转换："一片" -> density=0.7, "少量" -> density=0.3
+# "远处" -> distance=0.8, "山下" -> distance=0.2
 	var request = {
 					  "model": "Pro/deepseek-ai/DeepSeek-V3",  # 硅基流动 Pro 版模型 [5](@ref)
 					  "messages": [

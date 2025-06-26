@@ -50,27 +50,29 @@ offset_bottom = 6.0
 
 [node name="TextEdit" type="TextEdit" parent="StoryCreator/InputPanel"]
 layout_mode = 1
-offset_left = 30.0
+offset_left = 23.0
 offset_top = 18.0
-offset_right = 156.0
-offset_bottom = 72.0
+offset_right = 442.0
+offset_bottom = 97.0
 text = "一片被迷雾笼罩的魔法森林，远处有积雪的火山，山下有河流，还有村庄"
 placeholder_text = "test ts"
 scroll_smooth = true
 scroll_v_scroll_speed = 38.0
+minimap_draw = true
 minimap_width = 92
 
 [node name="DebugBtn" type="Button" parent="StoryCreator/InputPanel"]
 layout_mode = 0
-offset_left = 233.0
-offset_top = 56.0
-offset_right = 273.0
-offset_bottom = 87.0
+offset_left = 399.0
+offset_top = 112.0
+offset_right = 439.0
+offset_bottom = 143.0
 text = "调试"
 
 [node name="HintLabel" type="Label" parent="StoryCreator/InputPanel"]
 layout_mode = 0
-offset_right = 40.0
+offset_left = 29.0
+offset_right = 311.0
 offset_bottom = 23.0
 
 [node name="LoadingIndicator" type="Control" parent="StoryCreator"]

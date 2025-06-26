@@ -1,12 +1,15 @@
-class_name MapGenerator
-
+# godot4.4.1
 # 动态加载配置文件
+class_name MapGenerator
 var _terrain_params = _load_json("res://config/TerrainParameters.json")
 var _resource_bindings = _load_json("res://config/ResourceBindings.json")
 var _material_cache = {}
+var _position_reference_points = {}
 
 func generate_from_data(data: Dictionary) -> Node3D:
 	var map_root = Node3D.new()
+	# 0. 处理位置参考点
+	_process_position_data(data)
 	# 1. 动态创建地形基底
 	var ground = _create_terrain(data)
 	map_root.add_child(ground)
@@ -15,7 +18,68 @@ func generate_from_data(data: Dictionary) -> Node3D:
 	# 3. 动态配置光照
 	var sun = _create_sun_light(data)
 	map_root.add_child(sun)
+ 	# 4. 添加天气效果
+	var weather = _create_weather(data)
+	if weather:
+		map_root.add_child(weather)
+	
 	return map_root
+	
+func _create_weather(data: Dictionary) -> Node:
+	var atmosphere = data.get("atmosphere", {})
+	var weather_type = atmosphere.get("weather", "")
+	
+	if weather_type.is_empty():
+		return null
+	
+	# 从资源绑定获取天气配置
+	var weather_configs = _resource_bindings.get("weather_settings", {})
+	if not weather_configs.has(weather_type):
+		push_error("未知天气类型: " + weather_type)
+		return null
+	
+	var config = weather_configs[weather_type]
+	
+	# 创建环境节点
+	var env = WorldEnvironment.new()
+	var environment = Environment.new()
+	
+	# 配置雾效（示例）
+	if config.get("fog_enabled", false):
+		environment.fog_enabled = true
+		environment.volumetric_fog_albedo = Color(config.get("fog_color", "#FFFFFF"))
+		environment.fog_depth_begin = config.get("fog_start", 5.0)
+		environment.fog_depth_end = config.get("fog_end", 50.0)
+		environment.fog_depth_curve = config.get("fog_curve", 1.0)
+	
+	# 配置粒子效果（示例）
+	if config.get("particles_enabled", false):
+		var particles = GPUParticles3D.new()
+		particles.process_material = load(config["particle_material"])
+		particles.amount = config.get("particle_amount", 100)
+		particles.explosiveness = config.get("particle_density", 0.8)
+		particles.lifetime = config.get("particle_lifetime", 2.0)
+		particles.position = Vector3(0, config.get("particle_height", 10.0), 0)
+		env.add_child(particles)
+	
+	env.environment = environment
+	return env	
+	
+# 处理位置数据并缓存参考点
+func _process_position_data(data: Dictionary):
+	var position = data.get("position", {})
+	if not position.is_empty():
+		var ref_point = position.get("reference_point", "")
+		var distance = position.get("distance", 0.5)
+		
+		# 生成参考点位置（随机但符合距离约束）
+		var ref_pos = Vector3(
+			randf_range(-10 * distance, 10 * distance),
+			0,
+			randf_range(-10 * distance, 10 * distance)
+		)
+		
+		_position_reference_points[ref_point] = ref_pos
 
 func _create_terrain(data: Dictionary) -> MeshInstance3D:
 	var plane = PlaneMesh.new()
@@ -48,45 +112,99 @@ func _create_terrain(data: Dictionary) -> MeshInstance3D:
 func _generate_objects(data: Dictionary, parent: Node3D):
 	var keywords = _convert_data_to_keywords(data)
 	var multimeshes = {}
+	
+	# 1. 处理位置约束
+	var position_constraint = data.get("position", {})
+	var settlements = data.get("settlements", {})
+	var settlement_constraint = settlements.get("position", {})
+	
 	for keyword in keywords:
 		# 从JSON获取模型路径
-		var asset_type =_resource_bindings["asset_type"].get(keyword, "")
+		var asset_type = _resource_bindings["asset_type"].get(keyword, "")
 		var model_path = _resource_bindings["model_bindings"].get(asset_type, "")
+		
+		
 		if model_path && ResourceLoader.exists(model_path):
 			var asset = load(model_path)
-
+			
 			if not multimeshes.has(asset_type):
 				multimeshes[asset_type] = {
 					"positions": [],
-					"mesh":asset
+					"mesh": asset
 				}
-
 			
-			# 根据植被密度调整数量
-			var density = data.get("vegetation", {}).get("density", 1.0)
+			# 2. 确定物体密度
+			var density = 1.0
+			if asset_type == "森林":
+				density = data.get("vegetation", {}).get("density", 1.0)
+			elif asset_type == "村庄":  # 村庄、哨站等
+				density = settlements.get("density", 0.3)
+			
 			var count = max(1, int(5 * density))
 			
+			# 3. 根据位置约束生成位置
 			for i in count:
-				multimeshes[asset_type]["positions"].append(Vector3(
-					randf_range(-8, 8),
-					0,
-					randf_range(-8, 8)
-			))
-	# 批量渲染物体
+				var position = Vector3.ZERO
+				
+				# 3.1 处理位置约束
+				if not position_constraint.is_empty() and keyword == position_constraint.get("reference_point", ""):
+					var ref_point = position_constraint["reference_point"]
+					var distance = position_constraint.get("distance", 0.5)
+					
+					if _position_reference_points.has(ref_point):
+						var ref_pos = _position_reference_points[ref_point]
+						position = ref_pos + Vector3(
+							randf_range(-5 * distance, 5 * distance),
+							0,
+							randf_range(-5 * distance, 5 * distance)
+						)
+				
+				# 3.2 处理定居点位置约束
+				elif not settlement_constraint.is_empty() and keyword == settlement_constraint.get("reference_point", ""):
+					var ref_point = settlement_constraint["reference_point"]
+					var distance = settlement_constraint.get("distance", 0.3)
+					
+					if _position_reference_points.has(ref_point):
+						var ref_pos = _position_reference_points[ref_point]
+						position = ref_pos + Vector3(
+							randf_range(-3 * distance, 3 * distance),
+							0,
+							randf_range(-3 * distance, 3 * distance)
+						)
+				
+				# 3.3 无位置约束的随机分布
+				else:
+					position = Vector3(
+						randf_range(-8, 8),
+						0,
+						randf_range(-8, 8)
+					)
+				
+				multimeshes[asset_type]["positions"].append(position)
+	
+	# 4. 批量渲染物体
 	for asset_type in multimeshes:
-		# 修复：重命名内部变量避免冲突
-		var mesh_data = multimeshes[asset_type]  # 将"data"改为"mesh_data"
-
+		var mesh_data = multimeshes[asset_type]
+		
+		# 4.1 创建多网格实例
 		var multi_instance = MultiMeshInstance3D.new()
 		multi_instance.multimesh = _create_multimesh(mesh_data["mesh"], mesh_data["positions"])
-
-		# 修复：同步修改条件判断中的变量名
+		
+		# 4.2 处理特殊材质
 		if asset_type == "森林" and data.has("vegetation") and data["vegetation"].has("color"):
 			var color_hex = data["vegetation"]["color"]
 			multi_instance.material_override = _get_material_with_color(asset_type, color_hex)
 		else:
 			multi_instance.material_override = _get_material_by_type(asset_type)
-
+		
+		var settlements_type = _resource_bindings["settlements_mapping"].get(asset_type, "")
+		print("settlements_type: ", settlements_type)
+		# 4.3 处理定居点高度
+		if settlements_type != "":
+			# 如果是山下村庄，降低高度
+			if settlement_constraint.get("distance", 1.0) < 0.3:
+				multi_instance.position.y = -1.0
+		
 		parent.add_child(multi_instance)
 		
 # 获取带特定颜色的材质
@@ -123,8 +241,8 @@ func _get_material_by_type(type: String) -> StandardMaterial3D:
 		var config = _resource_bindings["material_cache"].get(type, {})
 
 		if config.is_empty():
-			match type:                 # 4 空格
-				"魔法森林":             # 4 空格（与上一行对齐）
+			match type:				 # 4 空格
+				"魔法森林":			 # 4 空格（与上一行对齐）
 					mat.albedo_color = Color(0.2, 0.4, 0.1)  # 8 空格（二级缩进）
 				_:
 					mat.albedo_color = Color(0.5, 0.5, 0.5)
@@ -272,5 +390,18 @@ func _convert_data_to_keywords(data: Dictionary) -> Array:
 			push_error("关键配置缺失: water_mapping")
 		if not water_asset.is_empty():
 			keywords.append(water_asset.to_lower())
+			
+	# 5. 建筑
+	var settlements = data.get("settlements", {})
+	if settlements.get("density", 0.0) > 0:
+		var settlements_type = settlements.get("type", "")
+		var settlements_asset = ""
+		if _resource_bindings.has("settlements_mapping"):
+			var settlements_map = _resource_bindings["settlements_mapping"]
+			settlements_asset = settlements_map.get(settlements_type, "")
+		else:
+			push_error("关键配置缺失: settlements_mapping")
+		if not settlements_asset.is_empty():
+			keywords.append(settlements_asset.to_lower())		
 	return keywords
 	

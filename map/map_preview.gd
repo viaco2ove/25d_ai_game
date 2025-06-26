@@ -1,4 +1,5 @@
 # map_preview.gd (附加到MapPreview节点)
+# godot4.4.1
 extends SubViewportContainer
 
 @onready var cam: Camera3D = $SubViewport/Camera3D
@@ -8,6 +9,14 @@ var map_generator = load("res://map/MapGenerator.gd").new()
 
 # 当前地图节点
 var _current_map: Node3D
+
+# 相机控制变量
+var camera_zoom_speed: float = 0.5
+var camera_rotate_speed: float = 0.5
+var min_zoom_distance: float = 5.0
+var max_zoom_distance: float = 50.0
+var current_zoom_level: float = 20.0
+var current_rotation: Vector2 = Vector2(-70, 0) # x: pitch, y: yaw
 
 func _ready():
 	# 设置初始尺寸
@@ -21,8 +30,41 @@ func _ready():
 
 	cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
 	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
-	cam.fov = 65	# 减小视野角度，减少透视畸变
+	
+	# 使用新的相机控制
+	current_rotation = Vector2(-70, 0)
+	current_zoom_level = 20.0
+	_update_camera_position()
+	
+	cam.fov = 65 # 减小视野角度，减少透视畸变
 	cam.current = true
+	
+	# 启用输入处理
+	set_process_input(true)
+	
+func _update_camera_position():
+	# 计算相机位置（球面坐标）
+	var direction = Vector3.FORWARD.rotated(Vector3.UP, deg_to_rad(current_rotation.y))
+	direction = direction.rotated(Vector3.RIGHT, deg_to_rad(current_rotation.x))
+	
+	cam.position = direction * current_zoom_level
+	cam.look_at(Vector3.ZERO, Vector3.UP)
+
+func _input(event):
+	# 鼠标滚轮缩放
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			current_zoom_level = clamp(current_zoom_level - camera_zoom_speed, min_zoom_distance, max_zoom_distance)
+			_update_camera_position()
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			current_zoom_level = clamp(current_zoom_level + camera_zoom_speed, min_zoom_distance, max_zoom_distance)
+			_update_camera_position()
+	
+	# 鼠标拖动旋转（右键）
+	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		current_rotation.y -= event.relative.x * camera_rotate_speed
+		current_rotation.x = clamp(current_rotation.x - event.relative.y * camera_rotate_speed, -85.0, -20.0)
+		_update_camera_position()
 
 func _on_resized():
 	$SubViewport.size = size

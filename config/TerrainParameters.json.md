@@ -8,15 +8,7 @@
 	  }
 	},
 	"魔法森林": {
-	  "base_color": [0.2, 0.4, 0.1],
-		"position_rules": {
-			"reference_points": ["火山", "河流"],
-			"distance_range": [0.0, 1.0]
-		},
-		"settlements": {
-			"type": ["村庄", "哨站"],
-			"density_range": [0.1, 0.5]
-		},	
+	  "base_color": [0.8, 0.7, 0.4],
 	  "elevation": {
 		"type": ["火山", "积雪火山", "丘陵"],
 		"intensity_range": [0.3, 0.8]
