@@ -18,6 +18,12 @@ var max_zoom_distance: float = 50.0
 var current_zoom_level: float = 20.0
 var current_rotation: Vector2 = Vector2(-70, 0) # x: pitch, y: yaw
 
+
+# 2.5D固定视角参数
+const FIXED_PITCH = 20  # 俯仰角（固定俯视角度）
+const FIXED_YAW = 15     # 偏航角（固定水平角度）
+
+
 func _ready():
 	# 设置初始尺寸
 	size = Vector2(800, 600)
@@ -28,14 +34,15 @@ func _ready():
 	# 监听尺寸变化
 	resized.connect(_on_resized)
 
-	cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
-	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
+
 	
 	# 使用新的相机控制
-	current_rotation = Vector2(-70, 0)
-	current_zoom_level = 20.0
+	current_rotation = Vector2(FIXED_PITCH, FIXED_YAW) 	# 调整角度，更接近2.5D视角
+	current_zoom_level = 20.0  # 提高Y轴位置，增强2.5D效果
 	_update_camera_position()
 	
+# 	cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
+ 	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
 	cam.fov = 65 # 减小视野角度，减少透视畸变
 	cam.current = true
 	
@@ -47,7 +54,8 @@ func _update_camera_position():
 	var direction = Vector3.FORWARD.rotated(Vector3.UP, deg_to_rad(current_rotation.y))
 	direction = direction.rotated(Vector3.RIGHT, deg_to_rad(current_rotation.x))
 	
-	cam.position = direction * current_zoom_level
+	var  cam_position  =direction * current_zoom_level
+	cam.position = cam_position
 	cam.look_at(Vector3.ZERO, Vector3.UP)
 
 func _input(event):

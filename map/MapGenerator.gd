@@ -113,6 +113,10 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 	var keywords = _convert_data_to_keywords(data)
 	var multimeshes = {}
 	
+	# 获取地形高度
+	var elevation_intensity = data.get("elevation", {}).get("intensity", 0.0)
+	var ground_height = -1 - elevation_intensity * 3
+	
 	# 1. 处理位置约束
 	var position_constraint = data.get("position", {})
 	var settlements = data.get("settlements", {})
@@ -155,7 +159,7 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 						var ref_pos = _position_reference_points[ref_point]
 						position = ref_pos + Vector3(
 							randf_range(-5 * distance, 5 * distance),
-							0,
+							 ground_height,  # 使用地形高度
 							randf_range(-5 * distance, 5 * distance)
 						)
 				
@@ -168,7 +172,7 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 						var ref_pos = _position_reference_points[ref_point]
 						position = ref_pos + Vector3(
 							randf_range(-3 * distance, 3 * distance),
-							0,
+							 ground_height,  # 使用地形高度
 							randf_range(-3 * distance, 3 * distance)
 						)
 				
@@ -176,7 +180,7 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 				else:
 					position = Vector3(
 						randf_range(-8, 8),
-						0,
+						 ground_height,  # 使用地形高度
 						randf_range(-8, 8)
 					)
 				
