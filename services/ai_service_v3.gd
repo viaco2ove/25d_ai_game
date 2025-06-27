@@ -4,6 +4,9 @@ extends Node
 const SILICONFLOW_API = "https://api.siliconflow.cn/v1/chat/completions"  # 硅基流动 API 地址 [5](@ref)
 var api_key = ""  # 从外部配置读取
 
+const MapConfig = preload("res://config/MapConfig.gd")
+
+
 func _ready():
 	print("user://config.cfg 实际路径为：",OS.get_user_data_dir()  + "/config.cfg")
 
@@ -16,39 +19,125 @@ func _ready():
 			push_warning("API密钥为空，请检查配置文件")
 	else:
 		push_error("无法加载配置文件")
-		
+
+func _load_json(path: String) -> Dictionary:
+	var file = FileAccess.open(path, FileAccess.READ)
+	if not file:
+		push_error("配置文件不存在: " + path)
+		return {}
+
+	var json_text = file.get_as_text()
+
+	var json = JSON.new()
+	var error = json.parse(json_text)
+
+	if error != OK:
+		var error_line = json.get_error_line()
+		var error_msg = json.get_error_message()
+		push_error("JSON解析失败！路径: %s, 行: %d, 错误: %s" % [path, error_line, error_msg])
+		return {}
+
+	return json.data		
+
+#biome地形类型：biome_mapping
+#elevation地形特征：elevation_mapping
+#water水域类型：water_mapping
+#vegetation植被：vegetation_mapping
+#atmospheres时间天气：light_settings，weather_settings
+#settlements建筑：settlements_mapping	
 # 地形解析函数（对接硅基流动 DeepSeek-V3 Pro）
+# 地形解析函数（改进版）
 func analyze_terrain(prompt: String) -> Dictionary:
+	# 获取地图配置
+	var map_config = MapConfig.new()
+	map_config.load_from_json("res://config/map_config.json")
+	
+	# 获取资源绑定配置
+	var resource_bindings = _load_json("res://config/ResourceBindings.json")
+	if resource_bindings.empty():
+		push_error("无法加载ResourceBindings.json")
+		return {}
+
+	# 获取地图配置
+	var category_mappings = [
+						   resource_bindings["biome_mapping"],
+						   resource_bindings["elevation_mapping"],
+						   resource_bindings["water_mapping"],
+						   resource_bindings["vegetation_mapping"],
+						   resource_bindings["settlements_mapping"]
+						   ]
+
+	var available_models = []
+	for mapping in category_mappings:
+		   for model in mapping.values():
+			   if not model in available_models:
+				   available_models.append(model)
+
+	
+	var available_model_types=["biome","elevation","water","vegetation","settlements"]
+	#首先我认为需要告诉ai 有哪些素材模型，地图有多大。
+	#ai 返回的数据也要更精确需要位置，范围。
+	#不在使用coverage，density 等模糊的参数。
 	var system_prompt = """
-	你是一个专业的地形生成AI，请将用户描述转换为JSON格式的地形参数（不要包含任何Markdown或代码块）：
-	{
-		"biome": "地形类型(如:魔法森林/沙漠/冰原)",
-		"elevation": {"type": "地形特征", "intensity": 0.0-1.0},
-		"water": {"type": "水域类型", "coverage": 0.0-1.0},
-		"vegetation": {"density": 0.0-1.0, "color": "HEX颜色"},
-		"position": {
-			"reference_point": "参考点(如:火山/河流)",
-			"distance": 0.0-1.0
-		},
-		"atmosphere": {"light": "白天/夜晚/黄昏", "weather": "晴朗/雾/雨"}
-		"settlements": {"type": "村庄/城堡", "density": 0.0-1.0}
-	}
-	// 位置转换规则：
-	"远处" -> distance=0.8, 
-	"山下" -> distance=0.2,
-	"附近" -> distance=0.3
-	"""
-# 量词转换："一片" -> density=0.7, "少量" -> density=0.3
-# "远处" -> distance=0.8, "山下" -> distance=0.2
+		你是一个专业的地形生成AI，请将用户描述转换为JSON格式的地形参数（不要包含任何Markdown或代码块）：
+        地图尺寸：{size_x}x{size_z}单位（坐标原点在中心）
+        x轴范围：{x_min} 到 {x_max}
+        z轴范围：{z_min} 到 {z_max}
+        
+		可用素材模型：
+		[
+			{model_list}
+		]
+		
+		可用元素类型：
+		[
+			{model_type}
+		]
+		
+		返回JSON结构：
+		{
+			"biome": "地形类型(如:魔法森林/沙漠/冰原)",
+			"elements": [
+				{
+					"mode_type": "元素类型(如:elevation/water)",
+					"mode_name": "元素名称(如:森林/山脉)",
+					"position": {"x": 精确X坐标, "z": 精确Z坐标},  // 范围: -10 到 10
+					"size": {"width": 宽度, "depth": 深度},	  // 单位尺寸
+					"rotation": 旋转角度(0-360)				 // 可选
+				},
+				// ...更多元素
+			],
+			"atmosphere": {
+				"light": "白天/夜晚/黄昏",
+				"weather": "晴朗/雾/雨"
+			}
+		}
+		
+		位置生成规则：
+		- "远处" -> x/z在 ±6-10 范围内
+		- "近处" -> x/z在 ±0-3 范围内
+		- "左侧" -> x < 0
+		- "右侧" -> x > 0
+		""".format({
+		"size_x": map_config.get_size().x,
+		"size_z": map_config.get_size().y,
+		"x_min": map_config.get_range("x").x,
+		"x_max": map_config.get_range("x").y,
+		"z_min": map_config.get_range("z").x,
+		"z_max": map_config.get_range("z").y,
+		"model_type": "\n\t\t".join(available_model_types),  # 动态生成模型列表
+		"model_list": "\n\t\t".join(available_models),  # 动态生成模型列表
+	})
+
 	var request = {
-					  "model": "Pro/deepseek-ai/DeepSeek-V3",  # 硅基流动 Pro 版模型 [5](@ref)
+					  "model": "Pro/deepseek-ai/DeepSeek-V3",
 					  "messages": [
 						  {"role": "system", "content": system_prompt},
 						  {"role": "user", "content": prompt}
 					  ],
 					  "temperature": 0.3,
-					  "max_tokens": 300
-				  }
+					  "max_tokens": 500  
+	}
 
 	# 重试机制
 	var retry_count = 0

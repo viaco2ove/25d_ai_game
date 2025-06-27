@@ -13,6 +13,16 @@
 	"哨站": "res://kenney_pirate-kit/Models/OBJ format/tower-watch.obj",
 	"积雪火山": "res://kenney_nature-kit/Models/OBJ format/stone_tallB.obj"
   },
+	"biome_mapping": {
+		"魔法森林": "魔法森林",
+		"沙漠": "沙漠",
+		"火山": "火山",
+		"冰原": "冰原"
+	},
+	"vegetation_mapping": {
+		"森林": "森林",
+		"积雪火山": "积雪火山"
+	},
 	"elevation_mapping": {
 		"积雪火山": "积雪火山",
 		"火山": "山脉",

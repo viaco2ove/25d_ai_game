@@ -6,6 +6,7 @@ extends SubViewportContainer
 
 # 地图生成器
 var map_generator = load("res://map/MapGenerator.gd").new()
+const MapConfig = preload("res://config/MapConfig.gd")
 
 # 当前地图节点
 var _current_map: Node3D
@@ -152,6 +153,12 @@ func _deferred_generate_map(story_text: String):
 
 # 简单地图生成函数（基于关键词）
 func _create_simple_map(keywords: Array) -> Node3D:
+	var map_config = MapConfig.new()
+	map_config.load_from_json("res://config/map_config.json")
+
+	var x_range = map_config.get_range("x")
+	var z_range = map_config.get_range("z")
+
 	var map_root = Node3D.new()
 
 	# 1. 生成地形基底
@@ -170,9 +177,9 @@ func _create_simple_map(keywords: Array) -> Node3D:
 					"mesh": map_generator._asset_map[asset_type]  # 使用地图生成器的资源
 				}
 			multimeshes[asset_type]["positions"].append(Vector3(
-				randf_range(-8, 8),
+				randf_range(x_range.x + 1,  x_range.y - 1),
 				0,
-				randf_range(-8, 8)
+				randf_range(z_range.x + 1, z_range.y - 1)
 			))
 
 	# 3. 批量渲染物体
@@ -258,10 +265,15 @@ func _create_multimesh(mesh: Mesh, positions: Array) -> MultiMesh:
 
 # 创建默认地形基底
 func _create_terrain() -> Node3D:
+	var map_config = MapConfig.new()
+	map_config.load_from_json("res://config/map_config.json")
+	
+	var map_size = map_config.get_size()
+
 	var plane_mesh = PlaneMesh.new()
-	plane_mesh.size = Vector2(20, 20)
-	plane_mesh.subdivide_width = 10
-	plane_mesh.subdivide_depth = 10
+	plane_mesh.size = map_size
+	plane_mesh.subdivide_width = max(1, int(map_size.x / 2))
+	plane_mesh.subdivide_depth = max(1, int(map_size.y / 2))
 
 	var mesh_instance = MeshInstance3D.new()
 	mesh_instance.mesh = plane_mesh
