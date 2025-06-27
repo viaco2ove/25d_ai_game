@@ -22,7 +22,7 @@ var current_rotation: Vector2 = Vector2(-70, 0) # x: pitch, y: yaw
 
 # 2.5D固定视角参数
 const FIXED_PITCH = 20  # 俯仰角（固定俯视角度）
-const FIXED_YAW = 15     # 偏航角（固定水平角度）
+const FIXED_YAW = 15	 # 偏航角（固定水平角度）
 
 
 func _ready():
