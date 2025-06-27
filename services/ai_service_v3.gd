@@ -60,18 +60,18 @@ func analyze_terrain(prompt: String) -> Dictionary:
 
 	# 获取地图配置
 	var category_mappings = [
-						   resource_bindings["biome_mapping"],
-						   resource_bindings["elevation_mapping"],
-						   resource_bindings["water_mapping"],
-						   resource_bindings["vegetation_mapping"],
-						   resource_bindings["settlements_mapping"]
-						   ]
+							resource_bindings["biome_mapping"],
+							resource_bindings["elevation_mapping"],
+							resource_bindings["water_mapping"],
+							resource_bindings["vegetation_mapping"],
+							resource_bindings["settlements_mapping"]
+							]
 
 	var available_models = []
 	for mapping in category_mappings:
-		   for model in mapping.values():
-			   if not model in available_models:
-				   available_models.append(model)
+		for model in mapping.values():
+			if not model in available_models:
+				available_models.append(model)
 
 	
 	var available_model_types=["biome","elevation","water","vegetation","settlements"]
@@ -80,10 +80,10 @@ func analyze_terrain(prompt: String) -> Dictionary:
 	#不在使用coverage，density 等模糊的参数。
 	var system_prompt = """
 		你是一个专业的地形生成AI，请将用户描述转换为JSON格式的地形参数（不要包含任何Markdown或代码块）：
-        地图尺寸：{size_x}x{size_z}单位（坐标原点在中心）
-        x轴范围：{x_min} 到 {x_max}
-        z轴范围：{z_min} 到 {z_max}
-        
+		地图尺寸：{size_x}x{size_z}单位（坐标原点在中心）
+		x轴范围：{x_min} 到 {x_max}
+		z轴范围：{z_min} 到 {z_max}
+		
 		可用素材模型：
 		[
 			{model_list}
