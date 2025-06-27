@@ -96,7 +96,10 @@ func analyze_terrain(prompt: String) -> Dictionary:
 		
 		返回JSON结构：
 		{
-			"biome": "地形类型(如:魔法森林/沙漠/冰原)",
+			"biome": {
+				"biome_type":"地形类型(如:魔法森林/沙漠/冰原)",
+				"base_color": "HEX颜色"
+			},
 			"elements": [
 				{
 					"mode_type": "元素类型(如:elevation/water)",
