@@ -128,7 +128,7 @@ func analyze_terrain(prompt: String) -> Dictionary:
 		"x_max": map_config.get_range("x").y,
 		"z_min": map_config.get_range("z").x,
 		"z_max": map_config.get_range("z").y,
-		"model_type": "\n\t\t".join(available_model_types),  # 动态生成模型列表
+		"model_type": "\n\t\t".join(available_model_types),  # 动态生成模型类型列表
 		"model_list": "\n\t\t".join(available_models),  # 动态生成模型列表
 	})
 
