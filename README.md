@@ -10,3 +10,4 @@ git commit -m "强制刷新 .gitignore 规则"
 
 ## godot 插件
 Godot-SQLite （需通过 AssetLib 安装）
+[addons.list](addons.list)
