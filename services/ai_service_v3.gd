@@ -1,14 +1,14 @@
 #ai_service_v3.gd
 extends Node
 
-const SILICONFLOW_API = "https://api.siliconflow.cn/v1/chat/completions"  # 硅基流动 API 地址 [5](@ref)
-var api_key = ""  # 从外部配置读取
+const SILICONFLOW_API = "https://api.siliconflow.cn/v1/chat/completions"	# 硅基流动 API 地址 [5](@ref)
+var api_key = ""	# 从外部配置读取
 
 const MapConfig = preload("res://config/MapConfig.gd")
 
 
 func _ready():
-	print("user://config.cfg 实际路径为：",OS.get_user_data_dir()  + "/config.cfg")
+	print("user://config.cfg 实际路径为：",OS.get_user_data_dir()	+ "/config.cfg")
 
 	var config_manager = ConfigManager.new()
 	var config = config_manager.load_config()
@@ -104,9 +104,9 @@ func analyze_terrain(prompt: String) -> Dictionary:
 				{
 					"mode_type": "元素类型(如:elevation/water)",
 					"mode_name": "元素名称(如:森林/山脉)",
-					"position": {"x": 精确X坐标, "z": 精确Z坐标},  // 范围: -10 到 10
-					"size": {"width": 宽度, "depth": 深度},	  // 单位尺寸
-					"rotation": 旋转角度(0-360)				 // 可选
+					"position": {"x": 精确X坐标, "z": 精确Z坐标},	// 范围: -10 到 10
+					"size": {"width": 宽度, "depth": 深度},		// 单位尺寸
+					"rotation": 旋转角度(0-360)			// 可选
 				},
 				// ...更多元素
 			],
@@ -128,18 +128,18 @@ func analyze_terrain(prompt: String) -> Dictionary:
 		"x_max": map_config.get_range("x").y,
 		"z_min": map_config.get_range("z").x,
 		"z_max": map_config.get_range("z").y,
-		"model_type": "\n\t\t".join(available_model_types),  # 动态生成模型类型列表
-		"model_list": "\n\t\t".join(available_models),  # 动态生成模型列表
+		"model_type": "\n\t\t".join(available_model_types),	# 动态生成模型类型列表
+		"model_list": "\n\t\t".join(available_models),	# 动态生成模型列表
 	})
 
 	var request = {
-					  "model": "Pro/deepseek-ai/DeepSeek-V3",
-					  "messages": [
-						  {"role": "system", "content": system_prompt},
-						  {"role": "user", "content": prompt}
-					  ],
-					  "temperature": 0.3,
-					  "max_tokens": 500  
+						"model": "Pro/deepseek-ai/DeepSeek-V3",
+						"messages": [
+							{"role": "system", "content": system_prompt},
+							{"role": "user", "content": prompt}
+						],
+						"temperature": 0.3,
+						"max_tokens": 500	
 	}
 
 	# 重试机制
@@ -177,17 +177,17 @@ func analyze_terrain(prompt: String) -> Dictionary:
 			else:
 				push_error("JSON解析失败: ", json.get_error_message(), " at line ", json.get_error_line())
 
-			return {}  # 失败时返回空字典
+			return {}	# 失败时返回空字典
 
-	return {}  # 失败时返回空字典
+	return {}	# 失败时返回空字典
 
 
 # 硅基流动 API 请求函数
 func _send_siliconflow_request(request_data: Dictionary) -> Dictionary:
 	var headers = [
-				  "Content-Type: application/json",
-				  "Authorization: Bearer " + api_key  # 从外部注入的 Key
-				  ]
+					"Content-Type: application/json",
+					"Authorization: Bearer " + api_key	# 从外部注入的 Key
+					]
 
 	var http_request = HTTPRequest.new()
 	add_child(http_request)
