@@ -4,3 +4,4 @@ config.cfg
 *.iml
 *.log
 *.tep
+*.tmp
