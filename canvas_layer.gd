@@ -150,3 +150,19 @@ func _on_text_changed():
 
 	# 重置提示文本颜色
 	hint_label.add_theme_color_override("font_color", Color.WHITE)
+
+# 加载草稿
+func load_draft(draft_id: int):
+	current_draft_id = draft_id
+
+	# 从数据库获取草稿数据
+	var draft_data = database.get_draft(draft_id)
+	if draft_data:
+		# 填充描述
+		text_edit.text = draft_data["description"]
+
+		# 如果有地图数据，加载地图预览
+		if draft_data.has("map_data") and not draft_data["map_data"].is_empty():
+			var map_data = JSON.parse_string(draft_data["map_data"])
+			if map_data and map_preview:
+				map_preview.generate_from_data(map_data)	

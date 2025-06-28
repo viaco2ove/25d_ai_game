@@ -178,4 +178,28 @@ func get_user_info(user_id: int) -> Dictionary:
 		return user_data
 	
 	db.close_db()
-	return {}	
+	return {}
+
+# 获取用户完整信息（用于个人页面）
+func get_full_user_data(user_id: int) -> Dictionary:
+	db.open_db()
+	var query = "SELECT * FROM users WHERE id = ?;"
+	if db.query_with_bindings(query, [user_id]) == OK and db.query_result.size() > 0:
+		var data = db.query_result[0]
+		data["preferences"] = JSON.parse_string(data["preferences"])  # JSON转数组
+		return data
+	return {}
+
+# 获取草稿详情
+func get_draft(draft_id: int) -> Dictionary:
+	db.open_db()
+	var query = "SELECT * FROM story_drafts WHERE id = ?;"
+	var bindings = [draft_id]
+
+	if db.query_with_bindings(query, bindings) == OK and db.query_result.size() > 0:
+		var draft = db.query_result[0]
+		db.close_db()
+		return draft
+
+	db.close_db()
+	return {}
