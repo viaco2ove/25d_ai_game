@@ -54,7 +54,7 @@ func analyze_terrain(prompt: String) -> Dictionary:
 	
 	# 获取资源绑定配置
 	var resource_bindings = _load_json("res://config/ResourceBindings.json")
-	if resource_bindings.empty():
+	if !resource_bindings:
 		push_error("无法加载ResourceBindings.json")
 		return {}
 

@@ -1,5 +1,7 @@
 # res://config/MapConfig.gd
 extends Node
+# 添加对FileUtil的引用
+const FileUtil = preload("res://utils/FileUtil.gd")
 
 # 地图基础配置（默认值）
 var config = {
@@ -12,17 +14,39 @@ var config = {
 
 # 从JSON文件加载配置
 func load_from_json(path: String) -> bool:
-	var file = FileAccess.open(path, FileAccess.READ)
-	if not file: return false
+	# 使用FileUtil读取JSON数据
+	var data = FileUtil.load_json(path)
+	if not data is Dictionary:
+		return false
 
-	var json = JSON.new()
-	if json.parse(file.get_as_text()) != OK: return false
+	# 转换并合并配置
+	return _convert_and_merge_config(data)
 
-	var data = json.get_data()
-	if data is Dictionary:
-		config = data
-		return true
-	return false
+# 转换并合并配置数据
+func _convert_and_merge_config(data: Dictionary) -> bool:
+	# 需要转换为Vector2的字段列表
+	var vector_fields = ["size", "origin", "x_range", "z_range", "height_range"]
+
+	for key in data:
+		if config.has(key):
+			var value = data[key]
+
+			# 处理Vector2转换
+			if key in vector_fields:
+				if value is Array and value.size() == 2:
+					config[key] = Vector2(value[0], value[1])
+				elif value is Vector2:
+					config[key] = value
+				else:
+					push_error("无效的Vector2数据: " + key)
+					return false
+			else:
+				# 其他字段直接赋值
+				config[key] = value
+		else:
+			push_warning("未知配置项: " + key)
+
+	return true
 
 # 获取地图尺寸
 func get_size() -> Vector2:

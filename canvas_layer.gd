@@ -12,6 +12,8 @@ extends CanvasLayer
 var map_preview: SubViewportContainer
 var ai_service: Node
 var is_debug_mode: bool = false  # 调试模式标志
+var current_draft_id: int = -1
+var database: Node
 
 func _ready():
 	# UI初始化
@@ -28,8 +30,11 @@ func _ready():
 	exit_debug_btn.visible = false  # 初始隐藏退出按钮
 	loading_indicator.visible = false
 	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）"
+	#show_loading()
+	# 初始化数据库引用
+	database = get_node("/root/Database")
 
-#	show_loading()
+
 	
 
 # 在 canvas_layer.gd 中添加
@@ -65,11 +70,14 @@ func _set_debug_mode(active: bool):
 		map_preview.set_render_enabled(active)
 
 func _on_generate_pressed() -> void:
-	if text_edit.text.strip_edges().is_empty():
+	var description = text_edit.text.strip_edges()
+	
+	if description.is_empty():
 		hint_label.text = "请输入描述内容!"
 		hint_label.add_theme_color_override("font_color", Color.RED)
 		return
-
+	if current_draft_id > 0:
+		database.update_draft_description(current_draft_id, description)
 	# 显示加载状态
 	show_loading()  # 使用统一方法控制加载状态
 	debug_btn.disabled = true
@@ -86,6 +94,10 @@ func _on_generate_pressed() -> void:
 		hint_label.text = "生成失败，请重试!"
 		hint_label.add_theme_color_override("font_color", Color.RED)
 		return
+	# 转换并保存地图数据
+	var map_data = _convert_ai_data(terrain_data)
+	if current_draft_id > 0:
+		database.update_draft_map_data(current_draft_id, description, map_data)
 
 	if map_preview:
 		# 进入调试模式
@@ -95,6 +107,26 @@ func _on_generate_pressed() -> void:
 	else:
 		push_error("MapPreview节点未找到!")
 
+# 转换AI数据为地图格式
+func _convert_ai_data(ai_data: Dictionary) -> Dictionary:
+	var map_data = {
+					   "biome": ai_data.get("biome", {}),
+					   "elements": [],
+					   "atmosphere": ai_data.get("atmosphere", {})
+				   }
+
+	for element in ai_data.get("elements", []):
+		var converted = {
+							"type": element["mode_type"],
+							"name": element["mode_name"],
+							"position": Vector3(element["position"]["x"], 0, element["position"]["z"]),
+							"size": Vector2(element["size"]["width"], element["size"]["depth"]),
+							"rotation": element.get("rotation", 0)
+						}
+		map_data["elements"].append(converted)
+
+	return map_data	
+	
 func _on_exit_debug_pressed() -> void:
 	_set_debug_mode(false)
 	print("_on_exit_debug_pressed ")

@@ -7,3 +7,6 @@ git commit -m "强制刷新 .gitignore 规则"
 
 ## godot 项目
 最简单的主界面->最简单的地图调试+最简单的素材
+
+## godot 插件
+Godot-SQLite （需通过 AssetLib 安装）

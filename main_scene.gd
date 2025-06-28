@@ -2,7 +2,7 @@ extends CanvasLayer
 # godot4.4.1
 
 @onready var add_btn: Button = $BottomMenu/MenuContainer/AddBtn
-
+var database: Node
 
 func _ready():
 	add_btn.pressed.connect(_on_AddBtn_pressed)
@@ -11,10 +11,12 @@ func _ready():
 	
 	for button in $BottomMenu/MenuContainer.get_children():
 		button.pressed.connect(_on_button_pressed.bind(button))
+		
+	database = get_node("/root/data/Database")
 	
 func _on_AddBtn_pressed():
 	print("尝试加载场景:StoryCreator")
-	
+	var draft_id = database.create_draft()
 	# 隐藏当前界面
 	visible = false
 	
