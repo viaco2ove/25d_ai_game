@@ -166,3 +166,16 @@ func get_user_drafts(user_id: int) -> Array:
 		push_error("Query drafts failed: " + db.error_message)
 		db.close_db()
 		return []
+
+func get_user_info(user_id: int) -> Dictionary:
+	db.open_db()
+	var query = "SELECT * FROM users WHERE id = ?;"
+	var bindings = [user_id]
+	
+	if db.query_with_bindings(query, bindings) == OK and db.query_result.size() > 0:
+		var user_data = db.query_result[0]
+		db.close_db()
+		return user_data
+	
+	db.close_db()
+	return {}	
