@@ -16,7 +16,7 @@
 	"村庄": "村庄",
 	"哨站": "哨站"
   },
-  available_model_types: [
+	"available_model_types": [
 	"biome",
 	"elevation",
 	"water",
