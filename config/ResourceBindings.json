@@ -1,183 +1,183 @@
 {
-	"asset_type": {
-	"森林": "森林",
-	"树林": "森林",
-	"丛林": "森林",
-	"魔法森林": "森林",
-	"山脉": "山脉",
-	"山峰": "山脉",
-	"山丘": "山脉",
-	"火山": "山脉",
-	"积雪火山": "山脉",
-	"河流": "河流",
-	"小溪": "河流",
-	"湖泊": "河流",
-	"水域": "河流",
-	"村庄": "村庄",
-	"哨站": "哨站"
-	},
-  "available_model_types": [
-	"biome",
-	"elevation",
-	"water",
-	"vegetation",
-	"settlements"
+  "asset_type": {
+    "森林": "森林",
+    "树林": "森林",
+    "丛林": "森林",
+    "魔法森林": "森林",
+    "山脉": "山脉",
+    "山峰": "山脉",
+    "山丘": "山脉",
+    "火山": "山脉",
+    "积雪火山": "山脉",
+    "河流": "河流",
+    "小溪": "河流",
+    "湖泊": "河流",
+    "水域": "河流",
+    "村庄": "村庄",
+    "哨站": "哨站"
+  },
+  available_model_types: [
+    "biome",
+    "elevation",
+    "water",
+    "vegetation",
+    "settlements"
   ],
   "model_bindings": {
-	"森林": "res://kenney_pirate-kit/Models/OBJ format/grass-patch.obj",
-	"山脉": "res://kenney_nature-kit/Models/OBJ format/rock_tallB.obj",
-	"河流": "res://kenney_nature-kit/Models/OBJ format/ground_pathBend.obj",
-	"村庄": "res://kenney_nature-kit/Models/OBJ format/tent_smallOpen.obj",
-	"哨站": "res://kenney_pirate-kit/Models/OBJ format/tower-watch.obj",
-	"积雪火山": "res://kenney_nature-kit/Models/OBJ format/stone_tallB.obj"
+    "森林": "res://kenney_pirate-kit/Models/OBJ format/grass-patch.obj",
+    "山脉": "res://kenney_nature-kit/Models/OBJ format/rock_tallB.obj",
+    "河流": "res://kenney_nature-kit/Models/OBJ format/ground_pathBend.obj",
+    "村庄": "res://kenney_nature-kit/Models/OBJ format/tent_smallOpen.obj",
+    "哨站": "res://kenney_pirate-kit/Models/OBJ format/tower-watch.obj",
+    "积雪火山": "res://kenney_nature-kit/Models/OBJ format/stone_tallB.obj"
   },
   "biome_mapping": {
-	"魔法森林": "魔法森林",
-	"沙漠": "沙漠",
-	"火山": "火山",
-	"冰原": "冰原"
+    "魔法森林": "魔法森林",
+    "沙漠": "沙漠",
+    "火山": "火山",
+    "冰原": "冰原"
   },
   "vegetation_mapping": {
-	"森林": "森林",
-	"积雪火山": "积雪火山"
+    "森林": "森林",
+    "积雪火山": "积雪火山"
   },
   "elevation_mapping": {
-	"积雪火山": "积雪火山",
-	"火山": "山脉",
-	"丘陵": "小山",
-	"峡谷": "裂谷"
+    "积雪火山": "积雪火山",
+    "火山": "山脉",
+    "丘陵": "小山",
+    "峡谷": "裂谷"
   },
   "settlements_mapping": {
-	"村庄": "村庄",
-	"哨站": "哨站"
+    "村庄": "村庄",
+    "哨站": "哨站"
   },
   "water_mapping": {
-	"河流": "河流",
-	"湖泊": "湖泊",
-	"海洋": "海洋"
+    "河流": "河流",
+    "湖泊": "湖泊",
+    "海洋": "海洋"
   },
   "material_cache": {
-	"魔法森林": {
-	  "albedo_color": [
-		0.2,
-		0.4,
-		0.1
-	  ],
-	  "roughness": 0.8
-	},
-	"森林": {
-	  "albedo_color": [
-		0.2,
-		0.4,
-		0.1
-	  ],
-	  "roughness": 0.8
-	},
-	"积雪火山": {
-	  "albedo_color": [
-		0.95,
-		0.95,
-		0.98
-	  ],
-	  "metallic": 0.2,
-	  "roughness": 0.8
-	},
-	"沙漠": {
-	  "albedo_color": [
-		0.8,
-		0.7,
-		0.4
-	  ],
-	  "roughness": 0.9
-	}
+    "魔法森林": {
+      "albedo_color": [
+        0.2,
+        0.4,
+        0.1
+      ],
+      "roughness": 0.8
+    },
+    "森林": {
+      "albedo_color": [
+        0.2,
+        0.4,
+        0.1
+      ],
+      "roughness": 0.8
+    },
+    "积雪火山": {
+      "albedo_color": [
+        0.95,
+        0.95,
+        0.98
+      ],
+      "metallic": 0.2,
+      "roughness": 0.8
+    },
+    "沙漠": {
+      "albedo_color": [
+        0.8,
+        0.7,
+        0.4
+      ],
+      "roughness": 0.9
+    }
   },
   "light_settings": {
-	"白天": {
-	  "rotation": [
-		45,
-		30,
-		0
-	  ],
-	  "color": [
-		1.0,
-		0.9,
-		0.8
-	  ],
-	  "energy": 1.5
-	},
-	"黄昏": {
-	  "rotation": [
-		-100,
-		30,
-		0
-	  ],
-	  "color": [
-		1.0,
-		0.7,
-		0.5
-	  ],
-	  "energy": 1.2
-	},
-	"夜晚": {
-	  "rotation": [
-		-150,
-		30,
-		0
-	  ],
-	  "color": [
-		0.5,
-		0.6,
-		1.0
-	  ],
-	  "energy": 0.5
-	}
+    "白天": {
+      "rotation": [
+        45,
+        30,
+        0
+      ],
+      "color": [
+        1.0,
+        0.9,
+        0.8
+      ],
+      "energy": 1.5
+    },
+    "黄昏": {
+      "rotation": [
+        -100,
+        30,
+        0
+      ],
+      "color": [
+        1.0,
+        0.7,
+        0.5
+      ],
+      "energy": 1.2
+    },
+    "夜晚": {
+      "rotation": [
+        -150,
+        30,
+        0
+      ],
+      "color": [
+        0.5,
+        0.6,
+        1.0
+      ],
+      "energy": 0.5
+    }
   },
   "weather_settings": {
-	"雾": {
-	  "fog_enabled": true,
-	  "fog_color": "#CCCCFF",
-	  "fog_start": 10.0,
-	  "fog_end": 50.0,
-	  "fog_curve": 0.8
-	},
-	"雨": {
-	  "particles_enabled": true,
-	  "particle_material": "res://addons/GodotWeatherSystem/weather/rain.tres",
-	  "particle_amount": 500,
-	  "particle_height": 15.0
-	},
-	"雪": {
-	  "particles_enabled": true,
-	  "particle_material": "res://addons/GodotWeatherSystem/weather/snow.tres",
-	  "particle_density": 0.5,
-	  "fog_enabled": true,
-	  "fog_color": "#EEEEFF"
-	},
-	"晴天": {
-	  "fog_enabled": false,
-	  "particles_enabled": false,
-	  "skybox": "res://addons/GodotWeatherSystem/weather/fine.tres",
-	  "ambient_light": {
-		"color": [
-		  1.0,
-		  1.0,
-		  0.9
-		],
-		"energy": 0.3
-	  }
-	},
-	"晴朗": {
-	  "fog_enabled": false,
-	  "particles_enabled": false,
-	  "skybox": "res://addons/GodotWeatherSystem/weather/fine.tres",
-	  "ambient_light": {
-		"color": [
-		  1.0,
-		  1.0,
-		  0.9
-		],
-		"energy": 0.3
-	  }
-	}
+    "雾": {
+      "fog_enabled": true,
+      "fog_color": "#CCCCFF",
+      "fog_start": 10.0,
+      "fog_end": 50.0,
+      "fog_curve": 0.8
+    },
+    "雨": {
+      "particles_enabled": true,
+      "particle_material": "res://addons/GodotWeatherSystem/weather/rain.tres",
+      "particle_amount": 500,
+      "particle_height": 15.0
+    },
+    "雪": {
+      "particles_enabled": true,
+      "particle_material": "res://addons/GodotWeatherSystem/weather/snow.tres",
+      "particle_density": 0.5,
+      "fog_enabled": true,
+      "fog_color": "#EEEEFF"
+    },
+    "晴天": {
+      "fog_enabled": false,
+      "particles_enabled": false,
+      "skybox": "res://addons/GodotWeatherSystem/weather/fine.tres",
+      "ambient_light": {
+        "color": [
+          1.0,
+          1.0,
+          0.9
+        ],
+        "energy": 0.3
+      }
+    },
+    "晴朗": {
+      "fog_enabled": false,
+      "particles_enabled": false,
+      "skybox": "res://addons/GodotWeatherSystem/weather/fine.tres",
+      "ambient_light": {
+        "color": [
+          1.0,
+          1.0,
+          0.9
+        ],
+        "energy": 0.3
+      }
+    }
   }
 }

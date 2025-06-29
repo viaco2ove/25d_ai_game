@@ -38,12 +38,12 @@ func _ready():
 
 	
 	# 使用新的相机控制
-	current_rotation = Vector2(FIXED_PITCH, FIXED_YAW)	# 调整角度，更接近2.5D视角
+	current_rotation = Vector2(FIXED_PITCH, FIXED_YAW) 	# 调整角度，更接近2.5D视角
 	current_zoom_level = 20.0  # 提高Y轴位置，增强2.5D效果
 	_update_camera_position()
 	
-	# cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
-	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
+# 	cam.position = Vector3(0, 20, 15)	# 提高Y轴位置，增强2.5D效果
+ 	cam.rotation_degrees = Vector3(-70, 0, 0)	# 调整角度，更接近2.5D视角
 	cam.fov = 65 # 减小视野角度，减少透视畸变
 	cam.current = true
 	
