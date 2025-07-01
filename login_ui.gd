@@ -3,7 +3,7 @@ extends Panel
 signal login_success(user_id: int)
 signal register_request
 
-@onready var nickname_input: LineEdit = $VBoxContainer/NicknameInput
+@onready var username_input: LineEdit = $VBoxContainer/UsernameInput
 @onready var password_input: LineEdit = $VBoxContainer/PasswordInput
 @onready var error_label: Label = $VBoxContainer/ErrorLabel
 
@@ -11,28 +11,34 @@ var database: Node
 
 func _ready():
 	# 获取数据库节点
-	database = get_node("/root/data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 
 	# 连接按钮信号
 	$VBoxContainer/HBoxContainer/LoginBtn.pressed.connect(_on_login_btn_pressed)
 	$VBoxContainer/HBoxContainer/RegisterBtn.pressed.connect(_on_register_btn_pressed)
 
 	# 回车键登录
-	nickname_input.text_submitted.connect(_on_text_submitted)
+	username_input.text_submitted.connect(_on_text_submitted)
 	password_input.text_submitted.connect(_on_text_submitted)
+	
+	
+		# 隐藏主界面
+	var main_ui = get_node_or_null("/root/MainUI")
+	if main_ui:
+		main_ui.visible = false
 
 # 处理输入框回车事件
 func _on_text_submitted(_text: String):
 	_on_login_btn_pressed()
 
 func _on_login_btn_pressed():
-	var nickname = nickname_input.text.strip_edges()
+	var username = username_input.text.strip_edges()
 	var password = password_input.text.strip_edges()
 
 	# 输入验证
-	if nickname.is_empty():
+	if username.is_empty():
 		error_label.text = "昵称不能为空"
-		nickname_input.grab_focus()
+		username_input.grab_focus()
 		return
 
 	if password.is_empty():
@@ -41,7 +47,7 @@ func _on_login_btn_pressed():
 		return
 
 	# 调用数据库登录
-	var user_id = database.login_user(nickname, password)
+	var user_id = database.login_user(username, password)
 	if user_id != -1:
 		login_success.emit(user_id)
 		error_label.text = ""  # 清空错误信息

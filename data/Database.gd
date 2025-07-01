@@ -1,48 +1,65 @@
-# Database.gd - 数据库服务层 (Godot 4.4.1)
+# /data/Database.gd - 数据库服务层 (Godot 4.4.1)
 extends Node
 
+# 修复点：取消注释并修正预加载路径
+#var SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 const DB_PATH = "user://story_drafts.db"
-var db: SQLite
+var db: SQLite  # 仅声明变量，不注解类型
+var is_ready = false
 
 func _ready():
+	print("Database node initialized! Path: ", get_path())
+	# 原有代码保持不变...
 	db = SQLite.new()
 	db.path = DB_PATH
+
+	print("User data dir: ", OS.get_user_data_dir())
+	if FileAccess.file_exists(DB_PATH):
+		print("DB file exists.")
+	
 	if db.open_db() != OK:
 		push_error("Database connection failed: " + db.error_message)
 		return
 
 	# 创建草稿表（关联用户ID）
 	db.query_with_bindings("""
-        CREATE TABLE IF NOT EXISTS story_drafts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,  -- 新增用户关联字段
-            title TEXT NOT NULL DEFAULT '未命名故事',
-            created_at TEXT NOT NULL,
-            description TEXT,
-            map_data TEXT,
-            status TEXT NOT NULL DEFAULT 'draft',
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        );
-    """, [])
+		CREATE TABLE IF NOT EXISTS story_drafts (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,  -- 新增用户关联字段
+			title TEXT NOT NULL DEFAULT '未命名故事',
+			created_at TEXT NOT NULL,
+			description TEXT,
+			map_data TEXT,
+			status TEXT NOT NULL DEFAULT 'draft',
+			FOREIGN KEY (user_id) REFERENCES users(id)
+		);
+	""", [])
 
 	# 创建用户表
 	db.query_with_bindings("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nickname TEXT NOT NULL UNIQUE,
-            gender TEXT CHECK(gender IN ('male', 'female', 'other')),
-            preferences TEXT,  -- JSON数组存储多选偏好
-            phone TEXT UNIQUE,
-            email TEXT UNIQUE,
-            avatar_path TEXT,  -- 头像文件路径
-            password_hash TEXT NOT NULL  -- 加密存储
-        );
-    """, [])
+		CREATE TABLE IF NOT EXISTS users (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL UNIQUE,
+			nickname TEXT NOT NULL,
+			gender TEXT CHECK(gender IN ('male', 'female', 'other')),
+			preferences TEXT,  -- JSON数组存储多选偏好
+			phone TEXT UNIQUE,
+			email TEXT UNIQUE,
+			avatar_path TEXT,  -- 头像文件路径
+			password_hash TEXT NOT NULL  -- 加密存储
+		);
+	""", [])
 	db.close_db()
+
+	is_ready = true
+
+func is_initialized():
+	return is_ready
 
 # ---------- 用户管理功能 ----------
 # 注册新用户（返回用户ID或-1失败）
 func register_user(
+	username: String,
 	nickname: String,
 	password: String,
 	gender: String = "other",
@@ -58,10 +75,11 @@ func register_user(
 	var password_hash = crypto.sha256(password.to_utf8_buffer()).hex_encode()
 
 	var query = """
-        INSERT INTO users (nickname, gender, preferences, phone, email, avatar_path, password_hash)
-        VALUES (?, ?, ?, ?, ?, ?, ?);
-    """
+		INSERT INTO users (username,nickname, gender, preferences, phone, email, avatar_path, password_hash)
+		VALUES (?,?, ?, ?, ?, ?, ?, ?);
+	"""
 	var bindings = [
+				username,
 				nickname,
 				gender,
 				JSON.stringify(preferences),  # 偏好转为JSON数组
@@ -81,10 +99,10 @@ func register_user(
 		return -1
 
 # 用户登录验证（返回用户ID或-1失败）
-func login_user(nickname: String, password: String) -> int:
+func login_user(username: String, password: String) -> int:
 	db.open_db()
-	var query = "SELECT id, password_hash FROM users WHERE nickname = ?;"
-	var bindings = [nickname]
+	var query = "SELECT id, password_hash FROM users WHERE username = ?;"
+	var bindings = [username]
 
 	if db.query_with_bindings(query, bindings) == OK and db.query_result.size() > 0:
 		var user_data = db.query_result[0]

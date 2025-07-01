@@ -6,7 +6,7 @@ var database: Node
 var current_user_id: int = -1
 
 func _ready():
-	database = get_node("/root/data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 	$VBoxContainer/BackBtn.pressed.connect(_on_back_pressed)
 
 # 设置当前用户ID并加载草稿

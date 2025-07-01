@@ -8,7 +8,7 @@ var current_user_id: int = -1  # -1表示未登录
 
 func _ready():
 	# 获取数据库节点
-	database = get_node("/root/data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 
 	# 检查登录状态
 	check_login_status()

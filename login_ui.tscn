@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://dhoq1owk7te21"]
+[gd_scene load_steps=5 format=3 uid="uid://dhoq1owk7te21"]
 
 [ext_resource type="Script" uid="uid://c1gydahaqy18p" path="res://login_ui.gd" id="1_abcde"]
+[ext_resource type="Theme" uid="uid://drh1gcllyfff7" path="res://new_theme.tres" id="1_q6pxb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6ahkl"]
+
+[sub_resource type="Theme" id="Theme_1s85c"]
 
 [node name="LoginUI" type="Panel"]
 anchors_preset = 15
@@ -8,19 +13,28 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("1_q6pxb")
+theme_override_styles/panel = SubResource("StyleBoxFlat_6ahkl")
 script = ExtResource("1_abcde")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-anchor_right = 1.0
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
 anchor_bottom = 1.0
+offset_left = -150.0
+offset_right = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1s85c")
 alignment = 1
 
-[node name="NicknameInput" type="LineEdit" parent="VBoxContainer"]
+[node name="UsernameInput" type="LineEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(300, 40)
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "请输入昵称"
+placeholder_text = "请输入用戶名"
 
 [node name="PasswordInput" type="LineEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(300, 40)
