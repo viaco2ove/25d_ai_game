@@ -32,7 +32,7 @@ func _ready():
 	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）"
 	#show_loading()
 	# 初始化数据库引用
-	database = get_node("/root/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 
 
 	
