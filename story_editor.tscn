@@ -1,11 +1,11 @@
 [gd_scene load_steps=10 format=3 uid="uid://d0pftcier2ckd"]
 
-[ext_resource type="Script" uid="uid://mgmjm2mmjfna" path="res://main_scene.gd" id="1_0xm2m"]
-[ext_resource type="Script" uid="uid://cjhxecs34uwxg" path="res://main.gd" id="1_1bvp3"]
-[ext_resource type="Script" uid="uid://b2igmyojuj8p4" path="res://map/map_preview.gd" id="1_h2yge"]
-[ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://canvas_layer.gd" id="1_ig7tw"]
-[ext_resource type="Theme" uid="uid://drh1gcllyfff7" path="res://new_theme.tres" id="4_lquwl"]
-[ext_resource type="Script" uid="uid://bo3x6diyb5oys" path="res://data/Database.gd" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://cjhxecs34uwxg" path="res://stotry_editor.gd" id="1_snmhm"]
+[ext_resource type="Script" uid="uid://bo3x6diyb5oys" path="res://data/Database.gd" id="2_1jyyi"]
+[ext_resource type="Script" uid="uid://b2igmyojuj8p4" path="res://map/map_preview.gd" id="3_silbp"]
+[ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://canvas_layer.gd" id="4_1wbvv"]
+[ext_resource type="Theme" uid="uid://drh1gcllyfff7" path="res://new_theme.tres" id="5_tcu1h"]
+[ext_resource type="Script" uid="uid://mgmjm2mmjfna" path="res://main_scene.gd" id="6_hq6wl"]
 
 [sub_resource type="Animation" id="Animation_272bh"]
 resource_name = "pin"
@@ -18,18 +18,16 @@ _data = {
 
 [sub_resource type="GDScript" id="GDScript_lquwl"]
 
-
-
 [node name="MainNote" type="Node2D"]
-script = ExtResource("1_1bvp3")
+script = ExtResource("1_snmhm")
 
 [node name="Database" type="Node" parent="."]
-script = ExtResource("6_7mycd")
+script = ExtResource("2_1jyyi")
 
 [node name="MapPreview" type="SubViewportContainer" parent="."]
 offset_right = 512.0
 offset_bottom = 512.0
-script = ExtResource("1_h2yge")
+script = ExtResource("3_silbp")
 
 [node name="SubViewport" type="SubViewport" parent="MapPreview"]
 handle_input_locally = false
@@ -38,7 +36,7 @@ render_target_update_mode = 4
 [node name="Camera3D" type="Camera3D" parent="MapPreview/SubViewport"]
 
 [node name="StoryCreator" type="CanvasLayer" parent="."]
-script = ExtResource("1_ig7tw")
+script = ExtResource("4_1wbvv")
 
 [node name="ExitDebugBtn" type="Button" parent="StoryCreator"]
 visible = false
@@ -91,7 +89,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="StoryCreator/LoadingIndicator"]
 libraries = {
@@ -106,7 +104,7 @@ offset_bottom = 23.0
 text = "加载中..."
 
 [node name="MainScene" type="CanvasLayer" parent="."]
-script = ExtResource("1_0xm2m")
+script = ExtResource("6_hq6wl")
 
 [node name="Background" type="TextureRect" parent="MainScene"]
 offset_right = 40.0
@@ -131,31 +129,29 @@ grow_vertical = 0
 [node name="MenuContainer" type="HBoxContainer" parent="MainScene/BottomMenu"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 alignment = 1
 
 [node name="BookBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 text = "列表📖"
 
 [node name="AddBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 text = "[ + ]"
 
 [node name="ChatBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 text = "聊天💬"
 
 [node name="UserBtn" type="Button" parent="MainScene/BottomMenu/MenuContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme = ExtResource("4_lquwl")
+theme = ExtResource("5_tcu1h")
 text = "用户👤"
-
-
