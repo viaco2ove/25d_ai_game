@@ -15,7 +15,7 @@ var database: Node
 
 func _ready():
 	# 使用更可靠的节点获取方式
-	database = get_tree().root.get_node("data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 
 	# 如果还是 null，尝试使用延迟获取
 	if database == null:
@@ -41,7 +41,7 @@ func _ready():
 	confirm_password_input.text_submitted.connect(_on_text_submitted)
 
 func _deferred_setup_database():
-	database = get_tree().root.get_node("data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 	if database == null:
 		push_error("Database node not found! Please check scene structure.")
 		
@@ -86,7 +86,7 @@ func _on_register_btn_pressed():
 		return
 
 	# 调用数据库注册
-	var user_id = database.register_user(username, password, gender)
+	var user_id = database.register_user(username,nickname, password, gender)
 	if user_id != -1:
 		register_success.emit(user_id)
 		error_label.text = ""  # 清空错误信息

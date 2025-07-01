@@ -25,6 +25,6 @@ func _ready():
 
 
 func _deferred_setup_database():
-	database = get_tree().root.get_node("data/Database")
+	database = get_tree().root.get_node("MainNote/Database")
 	if database == null:
 		push_error("Database node not found! Please check scene structure.")
