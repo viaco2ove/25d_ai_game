@@ -5,6 +5,8 @@ extends CanvasLayer
 @onready var user_btn: Button = $BottomMenu/MenuContainer/UserBtn
 var database: Node
 var current_user_id: int = -1  # -1表示未登录
+var user_service: UserService
+var draft_service: DraftService
 
 # 在文件顶部添加工具类引用
 const ToastUtils = preload("res://utils/toast_utils.gd")
@@ -12,6 +14,10 @@ const ToastUtils = preload("res://utils/toast_utils.gd")
 func _ready():
 	# 获取数据库节点
 	database = get_tree().root.get_node("MainNote/Database")
+
+	# 初始化业务服务
+	user_service = UserService.new(database)
+	draft_service = DraftService.new(database)
 
 	# 检查登录状态
 	check_login_status()
@@ -103,7 +109,7 @@ func _on_AddBtn_pressed():
 		return
 
 	print("尝试加载场景:StoryCreator")
-	var draft_id = database.create_draft(current_user_id)
+	var draft_id = draft_service.create_draft(current_user_id)
 	visible = false
 	var story_creator = get_node("/root/MainNote/StoryCreator")
 	story_creator.visible = true

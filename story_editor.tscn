@@ -1,9 +1,9 @@
 [gd_scene load_steps=10 format=3 uid="uid://d0pftcier2ckd"]
 
-[ext_resource type="Script" uid="uid://cjhxecs34uwxg" path="res://stotry_editor.gd" id="1_snmhm"]
+[ext_resource type="Script" uid="uid://cjhxecs34uwxg" path="res://story_editor.gd" id="1_snmhm"]
 [ext_resource type="Script" uid="uid://bo3x6diyb5oys" path="res://data/Database.gd" id="2_1jyyi"]
 [ext_resource type="Script" uid="uid://b2igmyojuj8p4" path="res://map/map_preview.gd" id="3_silbp"]
-[ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://canvas_layer.gd" id="4_1wbvv"]
+[ext_resource type="Script" uid="uid://mohqke3jihyu" path="res://story_editor_info.gd" id="4_1wbvv"]
 [ext_resource type="Theme" uid="uid://drh1gcllyfff7" path="res://new_theme.tres" id="5_tcu1h"]
 [ext_resource type="Script" uid="uid://mgmjm2mmjfna" path="res://main_scene.gd" id="6_hq6wl"]
 

@@ -4,10 +4,15 @@ signal draft_selected(draft_id: int)
 
 var database: Node
 var current_user_id: int = -1
+var user_service: UserService
+var draft_service: DraftService
 
 func _ready():
 	database = get_tree().root.get_node("MainNote/Database")
 	$VBoxContainer/BackBtn.pressed.connect(_on_back_pressed)
+	# 初始化业务服务
+	user_service = UserService.new(database)
+	draft_service = DraftService.new(database)
 
 # 设置当前用户ID并加载草稿
 func set_user_id(user_id: int):
@@ -19,7 +24,7 @@ func load_drafts():
 	if current_user_id == -1:
 		return
 
-	var drafts = database.get_user_drafts(current_user_id)
+	var drafts = draft_service.get_user_drafts(current_user_id)
 	$VBoxContainer/DraftList.clear()
 
 	for draft in drafts:
