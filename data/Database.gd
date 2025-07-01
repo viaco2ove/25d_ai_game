@@ -109,10 +109,15 @@ func login_user(username: String, password: String) -> int:
 
 	if db.query_with_bindings(query, bindings)  and db.query_result.size() > 0:
 		var user_data = db.query_result[0]
-		var crypto = Crypto.new()
-		var input_hash = crypto.sha256(password.to_utf8_buffer()).hex_encode()
 
-		if input_hash == user_data["password_hash"]:
+		# 密码加密（SHA-256）
+		var ctx = HashingContext.new()
+		ctx.start(HashingContext.HASH_SHA256)
+		ctx.update(password.to_utf8_buffer())
+		var password_hash = ctx.finish().hex_encode()
+		
+
+		if password_hash == user_data["password_hash"]:
 			db.close_db()
 			return user_data["id"]
 
