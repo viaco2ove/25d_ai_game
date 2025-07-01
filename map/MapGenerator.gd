@@ -90,7 +90,7 @@ func _create_terrain(data: Dictionary) -> MeshInstance3D:
 	mesh_instance.material_override = material
 
 	# 调整地形基底高度
-	mesh_instance.position = Vector3(0, -1, 0)
+	mesh_instance.position = Vector3(0, 0, 0)
 
 	return mesh_instance
 
@@ -106,16 +106,30 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 		var rotation = element.get("rotation", 0)
 
 		# 根据元素类型和名称获取模型路径
-		var model_path = ""
+		var model_mapping = ""
 		match element_type:
 			"elevation":
-				model_path = _resource_bindings["elevation_mapping"].get(element_name, "")
+				model_mapping = _resource_bindings["elevation_mapping"].get(element_name, "")
 			"water":
-				model_path = _resource_bindings["water_mapping"].get(element_name, "")
+				model_mapping = _resource_bindings["water_mapping"].get(element_name, "")
 			"settlements":
-				model_path = _resource_bindings["settlements_mapping"].get(element_name, "")
+				model_mapping = _resource_bindings["settlements_mapping"].get(element_name, "")
 			"vegetation":
-				model_path = _resource_bindings["vegetation_mapping"].get(element_name, "")
+				model_mapping = _resource_bindings["vegetation_mapping"].get(element_name, "")
+
+
+		if model_mapping.is_empty() :
+			push_error("未找到模型: " + model_mapping)
+			continue
+		
+		var asset_type = ""
+		asset_type = _resource_bindings["asset_type"].get(model_mapping, "")
+		if asset_type.is_empty():
+			push_error("未知资产类型: " + asset_type)
+			continue
+
+		var model_path = ""
+		model_path = _resource_bindings["model_bindings"].get(asset_type, "")
 
 		if model_path.is_empty() or not ResourceLoader.exists(model_path):
 			push_error("未找到模型: " + element_name + " 路径: " + model_path)
@@ -128,7 +142,7 @@ func _generate_objects(data: Dictionary, parent: Node3D):
 		# 设置位置（注意：y轴高度根据类型调整）
 		var y_pos = 0.0
 		if element_type == "elevation":
-			y_pos = 1.0  # 抬高地形
+			y_pos = 0  # 抬高地形?
 		instance.position = Vector3(position["x"], y_pos, position["z"])
 
 		# 设置旋转

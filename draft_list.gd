@@ -34,6 +34,8 @@ func load_drafts():
 # 草稿项被选中
 func _on_draft_selected(index: int):
 	var draft_id = $VBoxContainer/DraftList.get_item_metadata(index)
+	# 隐藏当前界面
+	visible = false
 	draft_selected.emit(draft_id)
 
 # 返回按钮

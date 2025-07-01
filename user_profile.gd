@@ -1,11 +1,33 @@
+# user_profile.gd  用户信息界面
 extends Panel
 
+
+
 @onready var drafts_btn = $VBoxContainer/DraftsBtn
+@onready var logout_btn = $VBoxContainer/LogoutBtn  # 需要在场景中添加此按钮
 var current_user_id: int = -1
 
 func _ready():
 	drafts_btn.pressed.connect(_on_drafts_btn_pressed)
+	logout_btn.pressed.connect(_on_logout_btn_pressed)
 
+
+# 添加退出按钮处理函数
+func _on_logout_btn_pressed():
+	# 清除登录状态
+	var config = ConfigFile.new()
+	config.set_value("login", "user_id", -1)
+	config.save("user://settings.cfg")
+
+	# 隐藏当前界面
+	visible = false
+
+	# 显示主界面
+	var main_scene = get_node("/root/MainNote/MainScene")
+	main_scene.current_user_id = -1
+	main_scene.visible = true
+	main_scene.check_login_status()  # 重新检查登录状态
+	
 func set_user_id(user_id: int):
 	current_user_id = user_id
 

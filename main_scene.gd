@@ -6,6 +6,9 @@ extends CanvasLayer
 var database: Node
 var current_user_id: int = -1  # -1表示未登录
 
+# 在文件顶部添加工具类引用
+const ToastUtils = preload("res://utils/toast_utils.gd")
+
 func _ready():
 	# 获取数据库节点
 	database = get_tree().root.get_node("MainNote/Database")
@@ -22,7 +25,23 @@ func _ready():
 
 	for button in $BottomMenu/MenuContainer.get_children():
 		button.pressed.connect(_on_button_pressed.bind(button))
+		
+	check_auto_login()	
 
+func check_auto_login():
+	# 使用 ConfigManager 加载配置
+	var config_manager = ConfigManager.new()
+	var config = config_manager.load_config()
+
+	# 从配置中获取用户ID
+	current_user_id = config.get_value("login", "user_id", -1)
+	if current_user_id != -1:
+		ToastUtils.show_toast("自动登录成功！用户ID: %d" % current_user_id, 2.0, self)
+		# 隐藏登录界面（如果存在）
+		if has_node("LoginUI"):
+			get_node("LoginUI").queue_free()
+
+				
 # 检查登录状态
 func check_login_status():
 	# TODO: 从本地存储加载登录状态（如ConfigFile）
@@ -41,13 +60,23 @@ func show_login_ui():
 
 # 登录成功回调
 func _on_login_success(user_id: int):
+	print("_on_login_success")
 	current_user_id = user_id
-	# TODO: 保存登录状态到本地存储
+
+	# 使用 ConfigManager 保存登录状态
+	var config_manager = ConfigManager.new()
+	var config = config_manager.load_config()
+	config.set_value("login", "user_id", user_id)
+	config_manager.save_config(config)  # 使用 save_config 方法保存
+
+	# 显示登录成功提示
+	ToastUtils.show_toast("登录成功！用户ID: %d" % user_id, 2.0, self)
 
 	# 隐藏登录界面
 	var login_ui = get_node("LoginUI")
 	if login_ui:
 		login_ui.queue_free()
+
 
 # 注册请求回调
 func _on_register_request():

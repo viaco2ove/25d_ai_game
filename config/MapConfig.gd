@@ -5,12 +5,12 @@ const FileUtil = preload("res://utils/FileUtil.gd")
 
 # 地图基础配置（默认值）
 var config = {
-				 "size": Vector2(20, 20),  # 地图尺寸 (x,z)
-				 "origin": Vector2(0, 0),  # 坐标原点
-				 "x_range": Vector2(-10, 10),  # x轴范围
-				 "z_range": Vector2(-10, 10),  # z轴范围
-				 "height_range": Vector2(-1, 5)  # 高度范围
-			 }
+	"size": Vector2(20, 20),  # 地图尺寸 (x,z)
+	"origin": Vector2(0, 0),  # 坐标原点
+	"x_range": Vector2(-10, 10),  # x轴范围
+	"z_range": Vector2(-10, 10),  # z轴范围
+	"height_range": Vector2(-1, 5)  # 高度范围
+}
 
 # 从JSON文件加载配置
 func load_from_json(path: String) -> bool:

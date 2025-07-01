@@ -1,17 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://b6ch7ssyu4fjq"]
+[gd_scene load_steps=3 format=3 uid="uid://b6ch7ssyu4fjq"]
 
 [ext_resource type="Script" uid="uid://cxgqimid7ntxs" path="res://user_profile.gd" id="1_8q5b0"]
+[ext_resource type="Theme" uid="uid://8nqiaocgybp" path="res://theme_white.tres" id="1_vrg0m"]
 
 [node name="UserProfile" type="Panel"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("1_vrg0m")
 script = ExtResource("1_8q5b0")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource("1_vrg0m")
+
+[node name="LogoutBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "退出登录"
 
 [node name="DraftsBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
