@@ -1,6 +1,7 @@
-# canvas_layer.gd -》StoryCreator（CanvasLayer）
+# story_editor_info.gd -》StoryCreator（CanvasLayer）
 extends CanvasLayer
 
+#点击调试后需要保存地图描述,ai 返回数据， 地图数据。 一个故事有多个地图。增加点击加号就多一个地图描述和调试按钮的功能
 # 节点引用
 @onready var input_panel: Panel = $InputPanel
 @onready var text_edit: TextEdit = $InputPanel/TextEdit
@@ -14,6 +15,16 @@ var ai_service: Node
 var is_debug_mode: bool = false  # 调试模式标志
 var current_draft_id: int = -1
 var database: Node
+var user_service: UserService
+var draft_service: DraftService
+
+var ai_response_data: Dictionary = {}
+var current_story: Dictionary = {
+   "title": "未命名故事",
+	"cover_path": "",
+   "description": "",
+   "maps": []  # 存储多个地图数据
+}
 
 func _ready():
 	# UI初始化
@@ -33,9 +44,11 @@ func _ready():
 	#show_loading()
 	# 初始化数据库引用
 	database = get_tree().root.get_node("MainNote/Database")
-
-
 	
+	# 初始化业务服务
+	user_service = UserService.new(database)
+	draft_service = DraftService.new(database)
+		
 
 # 在 canvas_layer.gd 中添加
 func show_loading():
@@ -77,7 +90,7 @@ func _on_generate_pressed() -> void:
 		hint_label.add_theme_color_override("font_color", Color.RED)
 		return
 	if current_draft_id > 0:
-		database.update_draft_description(current_draft_id, description)
+		draft_service.update_draft_description(current_draft_id, description)
 	# 显示加载状态
 	show_loading()  # 使用统一方法控制加载状态
 	debug_btn.disabled = true
@@ -97,7 +110,7 @@ func _on_generate_pressed() -> void:
 	# 转换并保存地图数据
 	var map_data = _convert_ai_data(terrain_data)
 	if current_draft_id > 0:
-		database.update_draft_map_data(current_draft_id, description, map_data)
+		draft_service.update_draft_map_data(current_draft_id, description, map_data)
 
 	if map_preview:
 		# 进入调试模式
@@ -156,7 +169,7 @@ func load_draft(draft_id: int):
 	current_draft_id = draft_id
 
 	# 从数据库获取草稿数据
-	var draft_data = database.get_draft(draft_id)
+	var draft_data = draft_service.get_draft(draft_id)
 	if draft_data:
 		# 填充描述
 		text_edit.text = draft_data["description"]

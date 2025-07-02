@@ -8,10 +8,14 @@ signal register_request
 @onready var error_label: Label = $VBoxContainer/ErrorLabel
 
 var database: Node
+var user_service: UserService
+
 
 func _ready():
 	# 获取数据库节点
 	database = get_tree().root.get_node("MainNote/Database")
+	# 初始化业务服务
+	user_service = UserService.new(database)
 
 	# 连接按钮信号
 	$VBoxContainer/HBoxContainer/LoginBtn.pressed.connect(_on_login_btn_pressed)
@@ -47,7 +51,7 @@ func _on_login_btn_pressed():
 		return
 
 	# 调用数据库登录
-	var user_id = database.login_user(username, password)
+	var user_id = user_service.login_user(username, password)
 	if user_id != -1:
 		login_success.emit(user_id)
 		error_label.text = ""  # 清空错误信息

@@ -12,11 +12,14 @@ signal register_success(user_id: int)
 @onready var back_btn: Button = $VBoxContainer/BackBtn
 
 var database: Node
+var user_service: UserService
 
 func _ready():
 	# 使用更可靠的节点获取方式
 	database = get_tree().root.get_node("MainNote/Database")
-
+	# 初始化业务服务
+	user_service = UserService.new(database)
+	
 	# 如果还是 null，尝试使用延迟获取
 	if database == null:
 		call_deferred("_deferred_setup_database")
@@ -86,7 +89,7 @@ func _on_register_btn_pressed():
 		return
 
 	# 调用数据库注册
-	var user_id = database.register_user(username,nickname, password, gender)
+	var user_id = user_service.register_user(username,nickname, password, gender)
 	if user_id != -1:
 		register_success.emit(user_id)
 		error_label.text = ""  # 清空错误信息

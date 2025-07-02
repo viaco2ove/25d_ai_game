@@ -1,6 +1,13 @@
+#story_editor.gd -> 故事编辑器场景 for story_editor.tscn(主节点MainNote 内含 MapPreview,$StoryCreator,Database 等子节点)
+#story_editor_info.gd-> 故事信息编辑器 for StoryCreator:CanvasLayer  in story_editor.tscn
 extends Node2D
 
 var database: Node
+
+# 增加故事的名称,描述,封面 的编辑框
+#点击调试后需要保存 地图描述,ai 返回数据， 地图数据,封面。 一个故事有多个地图。增加点击加号就多一个地图描述和调试按钮的功能
+#地图的删除,移动位置(顺序)
+#最下的保存和发布按钮
 # MainNote.gd
 func _ready():
 	var rootTree = get_tree().root.get_tree_string()

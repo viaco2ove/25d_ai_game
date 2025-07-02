@@ -88,3 +88,13 @@ func _copy_default_config():
 	dst_file.close()
 
 	print("已成功创建配置文件: ", config_path)
+
+# 在 ConfigManager.gd 中添加此方法
+func save_config(config: ConfigFile):
+	# 保存配置文件
+	var err = config.save(config_path)
+	if err != OK:
+		push_error("保存配置文件失败，错误代码: ", err)
+	else:
+		print("配置文件已成功保存到: ", config_path)
+	
