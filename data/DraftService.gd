@@ -30,22 +30,23 @@ func get_draft(draft_id: int) -> Dictionary:
 
 # 添加删除方法
 func delete_draft(draft_id: int) -> bool:
-	# 伪代码：实际实现数据库删除逻辑
-	database.execute("UPDATE story_drafts SET deleted = 1 WHERE id = %d" % draft_id)
-	return true
+	var query = "UPDATE story_drafts SET deleted = 1 WHERE id = ?"
+	return database.execute_query(query, [draft_id])
 
 # 修改查询方法（添加deleted参数）
 func get_user_drafts(user_id: int, include_deleted: bool = false) -> Array:
-	var query = "SELECT * FROM story_drafts WHERE user_id = %d" % user_id
+	var query = "SELECT * FROM story_drafts WHERE user_id = ?"
+	var bindings = [user_id]
+
 	if !include_deleted:
 		query += " AND deleted = 0"
-	return database.query(query)	
 
-# DraftService.gd 中添加
+	return database.fetch_query(query, bindings)
+
+# 更新草稿内容
 func update_draft_story(draft_id: int, story_data: Dictionary) -> bool:
 	var json_data = JSON.stringify(story_data)
 
-	# 更新故事草稿
 	var query = """
 		UPDATE story_drafts 
 		SET title = ?, description = ?, cover_path = ?, map_data = ?
@@ -60,4 +61,4 @@ func update_draft_story(draft_id: int, story_data: Dictionary) -> bool:
 				 draft_id
 				 ]
 
-	return database.query_with_params(query, params)	
+	return database.execute_query(query, params)

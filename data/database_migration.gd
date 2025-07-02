@@ -1,7 +1,7 @@
 # database_migration.gd
 class_name DatabaseMigration
 extends Node
-const DB_WANT_VERSION = 2  # 当前数据库版本
+const DB_WANT_VERSION = 3  # 当前数据库版本
 
 var database: SQLite= null
 

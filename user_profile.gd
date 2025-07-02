@@ -12,6 +12,7 @@ var current_user_id: int = -1
 func _ready():
 	drafts_btn.pressed.connect(_on_drafts_btn_pressed)
 	logout_btn.pressed.connect(_on_logout_btn_pressed)
+	close_btn.pressed.connect(_on_close_btn_pressed)
 
 
 # 添加退出按钮处理函数
@@ -38,7 +39,7 @@ func _on_drafts_btn_pressed():
 	var draft_list = preload("res://draft_list.tscn").instantiate()
 	get_parent().add_child(draft_list)
 	draft_list.set_user_id(current_user_id)
-	draft_list.draft_selected.connect(_on_draft_selected_edit)
+	draft_list.draft_selected_edit.connect(_on_draft_selected_edit)
 
 # 草稿被选中
 func _on_draft_selected_edit(draft_id: int):
