@@ -23,3 +23,7 @@ text = "退出登录"
 [node name="DraftsBtn" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "草稿箱"
+
+[node name="CloseBtn" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "关闭面板"

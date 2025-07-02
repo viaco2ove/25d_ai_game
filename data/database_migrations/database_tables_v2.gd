@@ -20,8 +20,6 @@ func execute(database: SQLite) -> bool:
 
 	# 3. 重建表以添加NOT NULL约束
 	if !database.query("""
-		CREATE TEMPORARY TABLE draft_maps_backup AS SELECT * FROM draft_maps;
-		DROP TABLE draft_maps;
 		CREATE TABLE draft_maps (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			draft_id INTEGER NOT NULL,
@@ -36,8 +34,6 @@ func execute(database: SQLite) -> bool:
 			cover_path TEXT,
 			FOREIGN KEY (draft_id) REFERENCES story_drafts(id)
 		);
-		INSERT INTO draft_maps SELECT * FROM draft_maps_backup;
-		DROP TABLE draft_maps_backup;
 	"""):
 		return false
 

@@ -43,7 +43,7 @@ func migrate_database():
 			return
 
 		database.query_with_bindings("""
-			INSERT OR REPLACE INTO DB_WANT_VERSION (version) VALUES (?);
+			INSERT OR REPLACE INTO db_version (version) VALUES (?);
 		""", [DB_WANT_VERSION])
 
 	database.close_db()

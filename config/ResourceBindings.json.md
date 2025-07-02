@@ -25,27 +25,27 @@
 ### 2. 材质配置 (`material_cache`)
 
 - **材质属性**：
-    - `albedo_color`：基础颜色 (RGB数组或十六进制)
-    - `roughness`：粗糙度 (0.0-1.0)
-    - `metallic`：金属感 (0.0-1.0)
+	- `albedo_color`：基础颜色 (RGB数组或十六进制)
+	- `roughness`：粗糙度 (0.0-1.0)
+	- `metallic`：金属感 (0.0-1.0)
 - **支持类型**：按元素类型或生物群系配置
 
 ### 3. 光照设置 (`light_settings`)
 - **参数说明**：
-    - `rotation`：光源旋转角度 (X,Y,Z)
-    - `color`：光照颜色 (RGB)
-    - `energy`：光照强度
+	- `rotation`：光源旋转角度 (X,Y,Z)
+	- `color`：光照颜色 (RGB)
+	- `energy`：光照强度
 - **预设类型**：白天、黄昏、夜晚等
 
 ### 4. 天气效果 (`weather_settings`)
 - **雾效参数**：
-    - `fog_enabled`：是否启用
-    - `fog_color`：雾颜色
-    - `fog_start/fog_end`：雾效范围
+	- `fog_enabled`：是否启用
+	- `fog_color`：雾颜色
+	- `fog_start/fog_end`：雾效范围
 - **粒子系统**：
-    - `particles_enabled`：是否启用
-    - `particle_material`：粒子材质路径
-    - `particle_amount`：粒子数量
+	- `particles_enabled`：是否启用
+	- `particle_material`：粒子材质路径
+	- `particle_amount`：粒子数量
 
 ## 使用建议
 

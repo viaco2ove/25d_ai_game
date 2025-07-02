@@ -41,11 +41,19 @@ func check_auto_login():
 
 	# 从配置中获取用户ID
 	current_user_id = config.get_value("login", "user_id", -1)
+
+	
+	
 	if current_user_id != -1:
-		ToastUtils.show_toast("自动登录成功！用户ID: %d" % current_user_id, 2.0, self)
-		# 隐藏登录界面（如果存在）
-		if has_node("LoginUI"):
-			get_node("LoginUI").queue_free()
+		var user =  user_service.get_user_info(current_user_id)
+		if user != null and user.id  != null:
+			ToastUtils.show_toast("自动登录成功！用户ID: %d" % current_user_id, 2.0, self)
+			# 隐藏登录界面（如果存在）
+			if has_node("LoginUI"):
+				get_node("LoginUI").queue_free()
+		else:
+			current_user_id	=-1
+			show_login_ui()
 
 				
 # 检查登录状态
@@ -113,6 +121,13 @@ func _on_AddBtn_pressed():
 	visible = false
 	var story_creator = get_node("/root/MainNote/StoryCreator")
 	story_creator.visible = true
+
+	# 加载草稿数据
+	story_creator.load_draft(draft_id)
+
+	# 重置编辑器UI状态
+	if story_creator.has_method("reset_ui"):
+		story_creator.reset_ui()	
 
 func _on_UserBtn_pressed():
 	if current_user_id == -1:

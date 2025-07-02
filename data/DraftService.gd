@@ -18,7 +18,7 @@ func create_draft(user_id: int, title: String = "未命名故事") -> int:
 	return -1
 
 # 获取用户草稿列表
-func get_user_drafts(user_id: int) -> Array:
+func get_user_drafts_all(user_id: int) -> Array:
 	var query = "SELECT id, title, created_at FROM story_drafts WHERE user_id = ? AND status = 'draft';"
 	return database.fetch_query(query, [user_id])
 
@@ -27,3 +27,37 @@ func get_draft(draft_id: int) -> Dictionary:
 	var query = "SELECT * FROM story_drafts WHERE id = ?;"
 	var result = database.fetch_query(query, [draft_id])
 	return result[0] if result.size() > 0 else {}
+
+# 添加删除方法
+func delete_draft(draft_id: int) -> bool:
+	# 伪代码：实际实现数据库删除逻辑
+	database.execute("UPDATE story_drafts SET deleted = 1 WHERE id = %d" % draft_id)
+	return true
+
+# 修改查询方法（添加deleted参数）
+func get_user_drafts(user_id: int, include_deleted: bool = false) -> Array:
+	var query = "SELECT * FROM story_drafts WHERE user_id = %d" % user_id
+	if !include_deleted:
+		query += " AND deleted = 0"
+	return database.query(query)	
+
+# DraftService.gd 中添加
+func update_draft_story(draft_id: int, story_data: Dictionary) -> bool:
+	var json_data = JSON.stringify(story_data)
+
+	# 更新故事草稿
+	var query = """
+		UPDATE story_drafts 
+		SET title = ?, description = ?, cover_path = ?, map_data = ?
+		WHERE id = ?
+	"""
+
+	var params = [
+				 story_data.get("title", ""),
+				 story_data.get("description", ""),
+				 story_data.get("cover_path", ""),
+				 json_data,
+				 draft_id
+				 ]
+
+	return database.query_with_params(query, params)	

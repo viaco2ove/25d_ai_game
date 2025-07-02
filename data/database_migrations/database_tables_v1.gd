@@ -15,7 +15,7 @@ func execute(database: SQLite) -> bool:
 			avatar_path TEXT,  -- 头像文件路径
 			password_hash TEXT NOT NULL  -- 加密存储
 		);
-	"""):
+	""",[]): 
 		return false
 
 	# 创建草稿表（关联用户ID）
@@ -30,8 +30,7 @@ func execute(database: SQLite) -> bool:
 			status TEXT NOT NULL DEFAULT 'draft',
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
-	"""):
+	""",[]): 
 		return false
 
-	# 后续创建draft_maps表的代码保持不变...
 	return true

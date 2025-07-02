@@ -19,6 +19,8 @@ func _ready():
 	
 	# 传递引用
 	story_creator.map_preview = map_preview
+
+	story_creator._setup_ui_layout()
 	
 	# 设置初始状态
 	map_preview.visible = true
