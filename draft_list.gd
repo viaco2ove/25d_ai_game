@@ -158,7 +158,8 @@ func _on_draft_selected():
 
 # 更新操作按钮状态
 func _update_button_states():
-	var selected_ids = _get_selected_draft_ids()
+#	var selected_ids = _get_selected_draft_ids()
+	var selected_ids = _get_checked_draft_ids()
 	batch_delete_btn.disabled = selected_ids.is_empty()
 
 # 获取选中的草稿ID

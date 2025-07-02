@@ -359,14 +359,18 @@ func _show_success(message: String):
 	hint_label.text = message
 	hint_label.add_theme_color_override("font_color", Color.GREEN)
 
+func safe_get_string(data: Dictionary, key: String, default: String = "") -> String:
+	var value = data.get(key)
+	return str(value) if value != null else default
+	
 # 草稿加载 =====================================================================
 func load_draft(draft_id: int):
 	current_draft_id = draft_id
 	var draft_data = draft_service.get_draft(draft_id)
 
 	if draft_data:
-		title_edit.text = draft_data.get("title", "")
-		desc_edit.text = draft_data.get("description", "")
+		title_edit.text = safe_get_string(draft_data, "title", "未命名故事")
+		desc_edit.text = safe_get_string(draft_data, "description")
 
 		# 加载地图数据
 		if draft_data.has("maps"):

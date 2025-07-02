@@ -51,6 +51,10 @@ func _on_draft_selected_edit(draft_id: int):
 	story_creator.visible = true
 	story_creator.load_draft(draft_id)
 
+	# 重置编辑器UI状态
+	if story_creator.has_method("reset_ui"):
+		story_creator.reset_ui()
+
 # 新增关闭面板函数
 func _on_close_btn_pressed():
 	# 仅隐藏当前面板，不改变登录状态
