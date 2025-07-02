@@ -1,7 +1,9 @@
 # godot4.4.1
 # 动态加载配置文件
 class_name MapGenerator
+#地形數據参数
 var _terrain_params = _load_json("res://config/TerrainParameters.json")
+#模型材質等资源的绑定
 var _resource_bindings = _load_json("res://config/ResourceBindings.json")
 var _material_cache = {}
 var _position_reference_points = {}
