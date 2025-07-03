@@ -1,2 +1,3 @@
-GodotWeatherSystem
-Godot-SQLite
+# 初始化子模块 git submodule update --remote
+git submodule add https://github.com/mlavik1/GodotWeatherSystem addons/GodotWeatherSystem
+git submodule add https://github.com/2shady4u/godot-sqlite addons/Godot-SQLite
