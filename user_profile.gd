@@ -5,11 +5,14 @@ extends Panel
 
 @onready var drafts_btn = $VBoxContainer/DraftsBtn
 @onready var logout_btn = $VBoxContainer/LogoutBtn  # 需要在场景中添加此按钮
+@onready var close_btn = $VBoxContainer/CloseBtn
+
 var current_user_id: int = -1
 
 func _ready():
 	drafts_btn.pressed.connect(_on_drafts_btn_pressed)
 	logout_btn.pressed.connect(_on_logout_btn_pressed)
+	close_btn.pressed.connect(_on_close_btn_pressed)
 
 
 # 添加退出按钮处理函数
@@ -36,10 +39,10 @@ func _on_drafts_btn_pressed():
 	var draft_list = preload("res://draft_list.tscn").instantiate()
 	get_parent().add_child(draft_list)
 	draft_list.set_user_id(current_user_id)
-	draft_list.draft_selected.connect(_on_draft_selected)
+	draft_list.draft_selected_edit.connect(_on_draft_selected_edit)
 
 # 草稿被选中
-func _on_draft_selected(draft_id: int):
+func _on_draft_selected_edit(draft_id: int):
 	# 隐藏当前界面
 	visible = false
 
@@ -47,3 +50,16 @@ func _on_draft_selected(draft_id: int):
 	var story_creator = get_node("/root/MainNote/StoryCreator")
 	story_creator.visible = true
 	story_creator.load_draft(draft_id)
+
+	# 重置编辑器UI状态
+	if story_creator.has_method("reset_ui"):
+		story_creator.reset_ui()
+
+# 新增关闭面板函数
+func _on_close_btn_pressed():
+	# 仅隐藏当前面板，不改变登录状态
+	visible = false
+
+	# 显示主界面（根据您的场景结构调整路径）
+	var main_scene = get_node("/root/MainNote/MainScene")
+	main_scene.visible = true	

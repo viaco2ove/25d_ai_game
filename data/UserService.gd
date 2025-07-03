@@ -95,3 +95,6 @@ func update_user_profile(
 	var query = "UPDATE users SET " + ", ".join(updates) + " WHERE id = ?;"
 	bindings.append(user_id)
 	return database.execute_query(query, bindings)
+
+
+	

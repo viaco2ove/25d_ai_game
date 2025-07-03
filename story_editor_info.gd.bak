@@ -1,0 +1,399 @@
+# story_editor_info.gd -》StoryCreator（CanvasLayer）
+extends CanvasLayer
+
+#点击调试后需要保存地图描述,ai 返回数据， 地图数据。 一个故事有多个地图。增加点击加号就多一个地图描述和调试按钮的功能
+# 节点引用
+@onready var hint_label: Label = $InputPanel/HintLabel
+@onready var loading_indicator: Control = $LoadingIndicator
+
+@onready var story_panel: Panel = $StoryPanel
+@onready var title_edit: LineEdit = $StoryPanel/TitleEdit
+@onready var cover_btn: Button = $StoryPanel/CoverBtn
+@onready var desc_edit: TextEdit = $StoryPanel/DescEdit
+@onready var maps_panel: Panel = $MapsPanel
+@onready var add_map_btn: Button = $MapsPanel/AddMapBtn
+@onready var map_list: VBoxContainer = $MapsPanel/MapList
+@onready var debug_panel: Panel = $DebugPanel
+@onready var map_desc_edit: TextEdit = $DebugPanel/MapDescEdit
+@onready var ai_data_edit: TextEdit = $DebugPanel/AIDataEdit
+@onready var map_data_edit: TextEdit = $DebugPanel/MapDataEdit
+@onready var regenerate_btn: Button = $DebugPanel/RegenerateBtn
+@onready var preview_btn: Button = $DebugPanel/PreviewBtn
+@onready var save_map_btn: Button = $DebugPanel/SaveMapBtn
+@onready var exit_debug_btn: Button = $DebugPanel/ExitDebugBtn2
+
+var map_preview: SubViewportContainer
+var ai_service: Node
+var is_debug_mode: bool = false  # 调试模式标志
+var current_draft_id: int = -1
+var database: Node
+var user_service: UserService
+var draft_service: DraftService
+
+var ai_response_data: Dictionary = {}
+var current_story: Dictionary = {
+   "title": "未命名故事",
+	"cover_path": "",
+   "description": "",
+   "maps": []  # 存储多个地图数据
+}
+var current_map_index: int = -1  # 当前调试的地图索引
+
+func _ready():
+	# UI初始化
+	_setup_ui_layout()
+
+	# 初始化AI服务
+	ai_service = load("res://services/ai_service_v3.gd").new()
+	add_child(ai_service)
+
+	# 设置初始UI状态
+	exit_debug_btn.visible = false  # 初始隐藏退出按钮
+	loading_indicator.visible = false
+	hint_label.text = "输入自然语言描述（如：一片被迷雾笼罩的魔法森林，远处有积雪的火山）"
+	#show_loading()
+	# 初始化数据库引用
+	database = get_tree().root.get_node("MainNote/Database")
+	
+	# 初始化业务服务
+	user_service = UserService.new(database)
+	draft_service = DraftService.new(database)
+
+
+	add_map_btn.pressed.connect(_on_add_map_pressed)
+	regenerate_btn.pressed.connect(_on_regenerate_pressed)
+	preview_btn.pressed.connect(_on_preview_pressed)
+	save_map_btn.pressed.connect(_on_save_map_pressed)
+	exit_debug_btn.pressed.connect(_on_exit_debug_pressed)
+
+	_update_map_list_ui()
+
+
+# 添加新地图
+func _on_add_map_pressed():
+	var new_map = {
+					  "map_name": "未命名地图",
+					  "cover_path": "",
+					  "description": "一片被迷雾笼罩的魔法森林，远处有积雪的火山，山下有河流，还有村庄",
+					  "ai_json_data": {},
+					  "processed_data": {},
+					  "sort_order": current_story["maps"].size()
+				  }
+	current_story["maps"].append(new_map)
+	_update_map_list_ui()
+
+# 更新地图列表UI
+func _update_map_list_ui():
+	# 清除现有地图项
+	for child in map_list.get_children():
+		child.queue_free()
+
+	# 创建新的地图项
+	for i in range(current_story["maps"].size()):
+		var map_data = current_story["maps"][i]
+		var map_item = _create_map_item(map_data, i)
+		map_list.add_child(map_item)
+
+# 创建单个地图项
+func _create_map_item(map_data: Dictionary, index: int) -> HBoxContainer:
+	var container = HBoxContainer.new()
+	container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	container.add_theme_constant_override("separation", 10)
+
+	# 地图名称
+	var name_edit = LineEdit.new()
+	name_edit.text = map_data["map_name"]
+	name_edit.placeholder_text = "地图名称"
+	name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_edit.text_changed.connect(_on_map_name_changed.bind(index))
+	container.add_child(name_edit)
+
+	# 调试按钮
+	var debug_btn = Button.new()
+	debug_btn.text = "调试"
+	debug_btn.custom_minimum_size = Vector2(60, 30)
+	debug_btn.pressed.connect(_on_map_debug_pressed.bind(index))
+	container.add_child(debug_btn)
+
+	# 删除按钮
+	var delete_btn = Button.new()
+	delete_btn.text = "删除"
+	delete_btn.custom_minimum_size = Vector2(60, 30)
+	delete_btn.pressed.connect(_on_map_delete_pressed.bind(index))
+	container.add_child(delete_btn)
+
+	return container
+
+# 地图名称改变
+func _on_map_name_changed(new_name: String, index: int):
+	current_story["maps"][index]["map_name"] = new_name
+
+# 地图调试按钮按下
+func _on_map_debug_pressed(index: int):
+	enter_debug_mode(index)
+
+# 地图删除按钮按下
+func _on_map_delete_pressed(index: int):
+	current_story["maps"].remove_at(index)
+	_update_map_list_ui()	
+	
+# 进入地图调试模式
+func enter_debug_mode(map_index: int):
+	current_map_index = map_index
+	var map_data = current_story["maps"][map_index]
+
+	# 设置调试面板内容
+	map_desc_edit.text = map_data["description"]
+	ai_data_edit.text = JSON.stringify(map_data["ai_json_data"], "\t")
+	map_data_edit.text = JSON.stringify(map_data["processed_data"], "\t")
+
+	# 显示调试面板
+	debug_panel.visible = true
+	story_panel.visible = false
+	maps_panel.visible = false
+
+# 重新生成AI数据
+func _on_regenerate_pressed():
+	var description = map_desc_edit.text.strip_edges()
+
+	if description.is_empty():
+		hint_label.text = "请输入地图描述!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+		return
+
+	# 显示加载状态
+	show_loading()
+	regenerate_btn.disabled = true
+
+	# 调用AI服务解析语义
+	var terrain_data = await ai_service.analyze_terrain(description)
+
+	# 隐藏加载状态
+	hide_loading()
+	regenerate_btn.disabled = false
+
+	if terrain_data.is_empty():
+		hint_label.text = "AI生成失败，请重试!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+		return
+
+	# 更新当前地图数据
+	var map_data = current_story["maps"][current_map_index]
+	map_data["ai_json_data"] = terrain_data
+	map_data["processed_data"] = _convert_ai_data(terrain_data)
+
+	# 更新UI显示
+	ai_data_edit.text = JSON.stringify(terrain_data, "\t")
+	map_data_edit.text = JSON.stringify(map_data["processed_data"], "\t")
+
+	hint_label.text = "AI数据已重新生成!"
+	hint_label.add_theme_color_override("font_color", Color.GREEN)
+
+# 执行预览
+func _on_preview_pressed():
+	# 获取当前地图数据
+	var map_data = current_story["maps"][current_map_index]
+
+	# 尝试解析地图数据
+	var preview_data
+	if map_data_edit.text.strip_edges().is_empty():
+		# 如果没有编辑过地图数据，使用AI数据
+		preview_data = map_data["ai_json_data"]
+	else:
+		# 尝试解析用户编辑的地图数据
+		var json = JSON.new()
+		var error = json.parse(map_data_edit.text)
+		if error == OK:
+			preview_data = json.get_data()
+		else:
+			hint_label.text = "地图数据格式错误!"
+			hint_label.add_theme_color_override("font_color", Color.RED)
+			return
+
+	if preview_data.is_empty():
+		hint_label.text = "无法生成预览，数据为空!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+		return
+
+	# 生成地图预览
+	if map_preview:
+		# 清除现有地图
+		map_preview._clear_current_map()
+
+		# 确保相机位置正确
+		map_preview.cam.position = Vector3(0, 20, 15)
+		map_preview.cam.rotation_degrees = Vector3(-70, 0, 0)
+
+		# 生成新地图
+		map_preview.generate_from_data(preview_data)
+
+		hint_label.text = "预览已生成!"
+		hint_label.add_theme_color_override("font_color", Color.GREEN)
+	else:
+		push_error("MapPreview节点未找到!")
+
+# 保存地图
+func _on_save_map_pressed():
+	# 获取当前地图数据
+	var map_data = current_story["maps"][current_map_index]
+
+	# 更新地图描述
+	map_data["description"] = map_desc_edit.text.strip_edges()
+
+	# 更新AI数据
+	if !ai_data_edit.text.strip_edges().is_empty():
+		var json = JSON.new()
+		if json.parse(ai_data_edit.text) == OK:
+			map_data["ai_json_data"] = json.get_data()
+
+	# 更新处理后的地图数据
+	if !map_data_edit.text.strip_edges().is_empty():
+		var json = JSON.new()
+		if json.parse(map_data_edit.text) == OK:
+			map_data["processed_data"] = json.get_data()
+
+	# 保存到数据库
+	if current_draft_id > 0:
+		# 更新整个故事数据
+		draft_service.update_draft_story(current_draft_id, current_story)
+
+		hint_label.text = "地图数据已保存!"
+		hint_label.add_theme_color_override("font_color", Color.GREEN)
+	else:
+		hint_label.text = "保存失败，草稿ID无效!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+
+
+# 在 canvas_layer.gd 中添加
+func show_loading():
+	loading_indicator.visible = true
+	print("LOADING STARTED: ", loading_indicator.visible)
+
+func hide_loading():
+	loading_indicator.visible = false
+# 可以在这里停止动画
+
+func _setup_ui_layout():
+	# 卡片式UI样式
+	var card_style = StyleBoxFlat.new()
+	card_style.bg_color = Color(0.12, 0.14, 0.18)
+	card_style.shadow_size = 6
+	card_style.shadow_color = Color(0, 0, 0, 0.3)
+	input_panel.add_theme_stylebox_override("panel", card_style)
+
+	# 配置浮动退出按钮
+	exit_debug_btn.text = "退出预览"
+	exit_debug_btn.position = Vector2(20, 20)  # 左上角位置
+	exit_debug_btn.size = Vector2(120, 40)
+	exit_debug_btn.add_theme_font_size_override("font_size", 16)
+
+func _set_debug_mode(active: bool):
+	is_debug_mode = active
+	input_panel.visible = !active  # 调试时隐藏输入面板
+	exit_debug_btn.visible = active  # 调试时显示退出按钮
+	debug_panel.visible = !active
+	story_panel.visible = active
+	maps_panel.visible = active
+	input_panel.visible = active
+	
+	# 控制地图预览渲染
+	if map_preview:
+		map_preview.set_render_enabled(active)
+
+func _on_generate_pressed() -> void:
+	var description = text_edit.text.strip_edges()
+	
+	if description.is_empty():
+		hint_label.text = "请输入描述内容!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+		return
+	if current_draft_id > 0:
+		draft_service.update_draft_description(current_draft_id, description)
+	# 显示加载状态
+	show_loading()  # 使用统一方法控制加载状态
+	debug_btn.disabled = true
+
+	# 调用AI服务解析语义
+	var terrain_data = await ai_service.analyze_terrain(text_edit.text)
+	
+	# 隐藏加载状态
+	hide_loading()  # 使用统一方法隐藏
+
+	debug_btn.disabled = false
+
+	if terrain_data.is_empty():
+		hint_label.text = "生成失败，请重试!"
+		hint_label.add_theme_color_override("font_color", Color.RED)
+		return
+	# 转换并保存地图数据
+	var map_data = _convert_ai_data(terrain_data)
+	if current_draft_id > 0:
+		draft_service.update_draft_map_data(current_draft_id, description, map_data)
+
+	if map_preview:
+		# 进入调试模式
+		_set_debug_mode(true)
+		# 生成地图
+		map_preview.generate_from_data(terrain_data)
+	else:
+		push_error("MapPreview节点未找到!")
+
+# 转换AI数据为地图格式
+func _convert_ai_data(ai_data: Dictionary) -> Dictionary:
+	var map_data = {
+					   "biome": ai_data.get("biome", {}),
+					   "elements": [],
+					   "atmosphere": ai_data.get("atmosphere", {})
+				   }
+
+	for element in ai_data.get("elements", []):
+		var converted = {
+							"type": element["mode_type"],
+							"name": element["mode_name"],
+							"position": Vector3(element["position"]["x"], 0, element["position"]["z"]),
+							"size": Vector2(element["size"]["width"], element["size"]["depth"]),
+							"rotation": element.get("rotation", 0)
+						}
+		map_data["elements"].append(converted)
+
+	return map_data	
+	
+func _on_exit_debug_pressed() -> void:
+	_set_debug_mode(false)
+	print("_on_exit_debug_pressed ")
+	hint_label.text = "正在退出预览..."
+	
+	if map_preview:
+		map_preview.reset_viewport()  # 先重置视口
+		map_preview._clear_current_map()  # 再删除节点
+		# 确保相机重置（防止偏移导致黑屏）
+		map_preview.cam.position = Vector3(0, 20, 15)
+		map_preview.cam.rotation_degrees = Vector3(-70, 0, 0)
+		
+	# 4. 重置UI状态
+	hint_label.add_theme_color_override("font_color", Color.WHITE)
+	
+
+func _on_text_changed():
+	# 输入时自动调整文本框大小
+	var line_count = text_edit.get_line_count()
+	text_edit.custom_minimum_size.y = max(200, line_count * 20)
+
+	# 重置提示文本颜色
+	hint_label.add_theme_color_override("font_color", Color.WHITE)
+
+# 加载草稿
+func load_draft(draft_id: int):
+	current_draft_id = draft_id
+
+	# 从数据库获取草稿数据
+	var draft_data = draft_service.get_draft(draft_id)
+	if draft_data:
+		# 填充描述
+		text_edit.text = draft_data["description"]
+
+		# 如果有地图数据，加载地图预览
+		if draft_data.has("map_data") and not draft_data["map_data"].is_empty():
+			var map_data = JSON.parse_string(draft_data["map_data"])
+			if map_data and map_preview:
+				map_preview.generate_from_data(map_data)	

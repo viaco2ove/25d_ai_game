@@ -1,7 +1,7 @@
 # database_migration.gd
 class_name DatabaseMigration
 extends Node
-const DB_WANT_VERSION = 2  # 当前数据库版本
+const DB_WANT_VERSION = 3  # 当前数据库版本
 
 var database: SQLite= null
 
@@ -43,7 +43,7 @@ func migrate_database():
 			return
 
 		database.query_with_bindings("""
-			INSERT OR REPLACE INTO DB_WANT_VERSION (version) VALUES (?);
+			INSERT OR REPLACE INTO db_version (version) VALUES (?);
 		""", [DB_WANT_VERSION])
 
 	database.close_db()
