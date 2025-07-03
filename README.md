@@ -1,3 +1,5 @@
+https://gitee.com/open_source_base/25d_ai_game.git
+
 ##  项目框架
 godot4.4.1
 ## 清除缓存并重新应用规则
